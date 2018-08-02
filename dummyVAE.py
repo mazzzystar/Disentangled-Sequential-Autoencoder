@@ -119,13 +119,13 @@ class VAE(nn.Module):
         return self.decode(z)
 
 def kl_crossentropy(original,recon,mean,logvar):
-    bce = F.binary_cross_entropy_with_logits(recon.view(-1,32*32*3),original.view(-1,32*32*3))
-    kld = -0.5 * torch.sum(1 + logvar - torch.pow(mean,2) - torch.exp(logvar))
+    bce = F.binary_cross_entropy_with_logits(recon.view(-2,32*32*3),original.view(-1,32*32*3),size_average=False)
+    kld = -0.5 * torch.sum(1 + logvar - torch.pow(mu,2) - torch.exp(logvar))
     return bce+kld
 
 def kl_meansquare(original,recon,mean,logvar):
-    kld = -0.5 * torch.sum(1 + logvar - torch.pow(mu,2) - torch.exp(logvar))
-    mse = F.mse_loss(recon.view(-1,32*32*3),original.view(-1,32*32*3))
+    kld = -0.5 * torch.sum(1 + logvar - torch.pow(mean,2) - torch.exp(logvar))
+    mse = F.mse_loss(recon.view(-1,32*32*3),original.view(-1,32*32*3),size_average=False)
     return mse+kld
 
 
@@ -142,7 +142,7 @@ class Trainer(object):
         self.checkpoints = checkpoints
         self.optimizer = optim.Adam(self.model.parameters(),self.learning_rate)
         
-    def save_checkpoint(epoch):
+    def save_checkpoint(self,epoch):
         torch.save({
             'epoch' : epoch+1,
             'state_dict' : self.model.state_dict(),
@@ -158,7 +158,7 @@ class Trainer(object):
             self.optimizer.load_state_dict(checkpoint['optimizer'])
             print("Resuming Training From Epoch {}".format(self.start_epoch))
         except:
-            print("No Checkkkpoint Exists At '{}'.Start Fresh Training".format(self.checkpoints))
+            print("No Checkpoint Exists At '{}'.Start Fresh Training".format(self.checkpoints))
             self.start_epoch = 0
 
     def train(self):
@@ -171,10 +171,11 @@ class Trainer(object):
                self.optimizer.zero_grad()
                #this part is VAE specific
                recon_x,mean,logvar = self.model(data)
-               loss = kl_crossentropy(data,recon_x,mean,logvar)
+               loss = kl_meansquare(data,recon_x,mean,logvar)
                loss.backward()
                self.optimizer.step()
                losses.append(loss.item())
+           print(len(losses) == self.batch_size)
            print("Epoch {} : Average Loss: {}".format(epoch,np.mean(losses)))
            self.save_checkpoint(epoch) 
        print("Training is complete")
@@ -190,7 +191,7 @@ testloader = torch.utils.data.DataLoader(trainset,batch_size,shuffle=True,num_wo
 
 vae = VAE()
 device = torch.device('cuda')
-trainer = Trainer(vae,device,trainloader,testloader,epochs,batch_size,0.001,'/cnn-vae-cifar.model')
+trainer = Trainer(vae,device,trainloader,testloader,epochs,batch_size,0.001,'./cnn-vae-cifar.model')
 trainer.load_checkpoint()
 trainer.train()
 
