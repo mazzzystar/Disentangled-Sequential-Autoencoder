@@ -57,3 +57,60 @@ class DisentangledVAE(nn.Module):
         recon_x = self.deconv(torch.cat((z,f_expand),dim=2))
         return f_mean,f_logvar,f,z_mean,z_logvar,z,recon_x
 
+def loss_fn(original,recon,f_mean,f_logvar,z_mean,z_logvar,unroll_size):
+    mse = F.mse_loss(recon.view(-1,unroll_size),original.view(-1,unroll_size),size_average=False)
+    kld_f = -0.5 * torch.sum(1 + f_logvar - torch.pow(f_mean,2) - torch.exp(f_logvar))
+    kld_z = -0.5 * torch.sum(1 + z_logvar - torch.pow(z_mean,2) - torch.exp(z_logvar))
+    return mse + kld_f + kld_z
+
+#Necessary changes will be made to trainer after exact CNN architecture is finalised
+class Trainer(object):
+    def __init__(self,model,device,trainloader,testloader,epochs,batch_size,learning_rate,checkpoints):
+        self.trainloader = trainloader
+        self.testloader = testloader
+        self.start_epoch = 0
+        self.epochs = epochs
+        self.batch_size = batch_size
+        self.model = model
+        self.model.to(device)
+        self.learning_rate = learning_rate
+        self.checkpoints = checkpoints
+        self.optimizer = optim.Adam(self.model.parameters(),self.learning_rate)
+        
+    def save_checkpoint(self,epoch):
+        torch.save({
+            'epoch' : epoch+1,
+            'state_dict' : self.model.state_dict(),
+            'optimizer' : self.optimizer.state_dict()},
+            self.checkpoints)
+        
+    def load_checkpoint(self):
+        try:
+            print("Loading Checkpoint from '{}'".format(self.checkpoints))
+            checkpoint = torch.load(self.checkpoints)
+            self.start_epoch = checkpoint['epoch']
+            self.model.load_state_dict(checkpoint['state_dict'])
+            self.optimizer.load_state_dict(checkpoint['optimizer'])
+            print("Resuming Training From Epoch {}".format(self.start_epoch))
+        except:
+            print("No Checkpoint Exists At '{}'.Start Fresh Training".format(self.checkpoints))
+            self.start_epoch = 0
+
+    def train(self):
+       self.model.train()
+       for epoch in range(self.start_epoch,self.epochs):
+           losses = []
+           print("Running Epoch : {}".format(epoch))
+           for i,(data,_) in enumerate(self.trainloader):
+               data = data.to(device)
+               self.optimizer.zero_grad()
+               #this part is VAE specific
+               recon_x,mean,logvar = self.model(data)
+               loss = kl_meansquare(data,recon_x,mean,logvar)
+               loss.backward()
+               self.optimizer.step()
+               losses.append(loss.item())
+           print(len(losses) == self.batch_size)
+           print("Epoch {} : Average Loss: {}".format(epoch,np.mean(losses)))
+           self.save_checkpoint(epoch) 
+       print("Training is complete")
