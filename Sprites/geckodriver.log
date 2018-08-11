@@ -1,0 +1,55 @@
+1534016508782	geckodriver	INFO	geckodriver 0.21.0
+1534016508937	geckodriver	INFO	Listening on 127.0.0.1:34305
+1534016509656	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.tgTvbpqipoiK"
+1534016515150	Marionette	INFO	Listening on port 46627
+1534016515176	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript warning: http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+1534016561367	geckodriver	INFO	geckodriver 0.21.0
+1534016561370	geckodriver	INFO	Listening on 127.0.0.1:35145
+1534016562405	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.cw7FUp6LRCvy"
+1534016563539	Marionette	INFO	Listening on port 46829
+1534016563609	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript warning: http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+1534016677704	geckodriver	INFO	geckodriver 0.21.0
+1534016677709	geckodriver	INFO	Listening on 127.0.0.1:57543
+1534016678743	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.uQ0a2TmXaXA9"
+1534016679884	Marionette	INFO	Listening on port 34165
+1534016679949	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript warning: http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+1534016834107	geckodriver	INFO	geckodriver 0.21.0
+1534016834110	geckodriver	INFO	Listening on 127.0.0.1:37203
+1534016835165	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.m1EDl2yc5Xdz"
+1534016836301	Marionette	INFO	Listening on port 44965
+1534016836370	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript warning: http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+[Parent 2509, Gecko_IOThread] WARNING: pipe error (62): Connection reset by peer: file /build/firefox/src/mozilla-unified/ipc/chromium/src/chrome/common/ipc_channel_posix.cc, line 353
+1534017050447	geckodriver	INFO	geckodriver 0.21.0
+1534017050450	geckodriver	INFO	Listening on 127.0.0.1:42827
+1534017051479	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.50ApxpZwX8eo"
+1534017052597	Marionette	INFO	Listening on port 42391
+1534017052683	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript warning: http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+1534017184126	geckodriver	INFO	geckodriver 0.21.0
+1534017184129	geckodriver	INFO	Listening on 127.0.0.1:44507
+1534017185161	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.UP9v2gmeUqPi"
+1534017186291	Marionette	INFO	Listening on port 43107
+1534017186372	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript warning: http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+1534017341539	geckodriver	INFO	geckodriver 0.21.0
+1534017341542	geckodriver	INFO	Listening on 127.0.0.1:56755
+1534017342573	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.kCYVXc560U5i"
+1534017343719	Marionette	INFO	Listening on port 42379
+1534017343778	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript warning: http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+1534017399356	geckodriver	INFO	geckodriver 0.21.0
+1534017399359	geckodriver	INFO	Listening on 127.0.0.1:48047
+1534017400391	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.rJqdUUDCvDiU"
+1534017401530	Marionette	INFO	Listening on port 34141
+1534017401603	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript warning: http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+1534017440317	geckodriver	INFO	geckodriver 0.21.0
+1534017440321	geckodriver	INFO	Listening on 127.0.0.1:54857
+1534017441354	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.DmSFmse6ansH"
+1534017442517	Marionette	INFO	Listening on port 41817
+1534017442561	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript warning: http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
