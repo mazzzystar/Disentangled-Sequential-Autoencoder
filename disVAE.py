@@ -8,22 +8,62 @@ class DisentangledVAE(nn.Module):
         super(DisentangledVAE,self).__init__(self)
         self.f_dim = params['f_dim']
         self.z_dim = params['z_dim']
-        self.input_dim = params['input_dim']
+        self.frames = params['frames']
         self.conv_dim = params['conv_dim']
         self.hidden_dim = params['hidden_dim']
-        self.conv = params['conv']
-        self.deconv = params['deconv']
+        self.conv_params = params['conv']
+        self.deconv_params = params['deconv']
         
         self.f_lstm = nn.LSTM(self.conv_dim, self.hidden_dim, 1,
-                bidirectional=True)
+                bidirectional=True,batch_first=True)
         self.f_mean = nn.Linear(self.hidden_dim*2, self.f_dim)
         self.f_logvar = nn.Linear(self.hidden_dim*2, self.f_dim)
 
         self.z_lstm = nn.LSTM(self.conv_dim+self.f_dim, self.hidden_dim, 1,
-                 bidirectional=True)
-        self.z_rnn = nn.RNN(self.hidden_dim*2, self.hidden_dim) 
+                 bidirectional=True,batch_first=True)
+        self.z_rnn = nn.RNN(self.hidden_dim*2, self.hidden_dim,batch_first=True) 
         self.z_mean = nn.Linear(self.hidden_dim, self.z_dim)
         self.z_logvar = nn.Linear(self.hidden_dim, self.z_dim)
+        
+        self.conv1 = nn.Conv2d(3,256,kernel_size=3,stride=2,padding=1)
+        self.bn1 = nn.BatchNorm2d(256)
+        self.conv2 = nn.Conv2d(256,256,kernel_size=3,stride=2,padding=1)
+        self.bn2 = nn.BatchNorm2d(256)
+        self.conv3 = nn.Conv2d(256.256.kernel_size=3,stride=2,padding=1)
+        self.bn3 = nn.BatchNorm2d(256)
+        self.conv4 = nn.Conv2d(256,256,kernel_size=3,stride=2,padding=1)
+        self.bn4 = nn.BatchNorm2d(256)
+        self.conv_fc = nn.Linear(4*4*256,self.conv_dim)
+        self.bnf = nn.BatchNorm1d(self.conv_dim) 
+
+        self.deconv_fc = nn.Linear(self.f_dim+self.z_dim,4*4*256)
+        self.deconv_bnf = nn.BatchNorm1d(4*4*256)
+        self.deconv4 = nn.ConvTranspose2d(256,256,kernel_size=3,stride=2,padding=1,output_padding=1)
+        self.dbn4 = nn.BatchNorm2d(256)
+        self.deconv3 = nn.ConvTranspose2d(256,256,kernel_size=3,stride=2,padding=1,output_padding=1)
+        self.dbn3 = nn.BatchNorm2d(256)
+        self.deconv2 = nn.ConvTranspose2d(256,256,kernel_size=3,stride=2,padding=1,output_padding=1)
+        self.dbn2 = nn.BatchNorm2d(256)
+        self.deconv1 = nn.ConvTranspose2d(256,3,kernel_size=3,stride=2,padding=1,output_padding=1)
+        self.dbn1 = nn.BatchNorm2d(3)
+        
+    def encode_frames(self,x):
+        x = x.view(-1,3,64,64) #Batchwise stack the 8 images for applying convolutions parallely
+        x = F.relu(self.bn1(self.conv1(x)))
+        x = F.relu(self.bn2(self.conv2(x)))
+        x = F.relu(self.bn3(self.conv3(x)))
+        x = F.relu(self.bn4(self.conv4(x)))
+        x = x.view(-1,4*4*256)
+        x = F.relu(self.bnf(self.conv_fc(x))) 
+        return x.view(-1,self.frames,self.conv_dim)
+
+    def decode_frames(self,zf):
+        x = F.relu(self.deconv_bnf(self.deconv_fc(zf)))
+        x = x.view(-1,256,4,4) #The 8 frames are stacked batchwise
+        x = F.relu(self.dbn4(self.deconv4(x)))
+        x = F.relu(self.dbn3(self.deconv3(x)))
+        x = F.relu(self.dbn2(self.deconv2(x)))
+        return F.relu(self.dbn1(self.deconv1(x))) #If images are in 0,1 range use ReLU otherwise use tanh
 
     def reparameterize(self,mean,logvar):
         if self.training:
@@ -36,9 +76,8 @@ class DisentangledVAE(nn.Module):
 
     def encode_f(self,x):
         lstm_out,_ = self.f_lstm(x)
-        seq_len = lstm_out.size(0)
-        mean = self.f_mean(lstm_out[seq_len])
-        logvar = self.f_logvar(lstm_out[seq_len])
+        mean = self.f_mean(lstm_out[:,self.seq_len-1])
+        logvar = self.f_logvar(lstm_out[:,self.seq_len-1])
         return mean,logvar,self.reparameterize(mean,logvar)
     
     def encode_z(self,x,f):
@@ -50,11 +89,11 @@ class DisentangledVAE(nn.Module):
         return mean,logvar,self.reparameterize(mean,logvar)
 
     def forward(self,x):
-        conv_x = self.conv(x)
+        conv_x = self.encode_frames(x)
         f_mean,f_logvar,f = self.encode_f(conv_x)
         z_mean,z_logvar,z = self.encode_z(conv_x,f)
         f_expand = f.expand(z.size(0),f.size(0),f.size(1))
-        recon_x = self.deconv(torch.cat((z,f_expand),dim=2))
+        recon_x = self.decode_frames(torch.cat((z,f_expand),dim=2))
         return f_mean,f_logvar,f,z_mean,z_logvar,z,recon_x
 
 def loss_fn(original,recon,f_mean,f_logvar,z_mean,z_logvar,unroll_size):
