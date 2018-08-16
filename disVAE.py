@@ -1,7 +1,11 @@
+import os
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+
+class Sprites(torch.utils.data.Dataset):
+
 
 class FullQDisentangledVAE(nn.Module):
         super(DisentangledVAE,self).__init__(self)
@@ -102,6 +106,7 @@ def loss_fn(original_seq,recon_seq,f_mean,f_logvar,z_mean,z_logvar):
     kld_z = -0.5 * torch.sum(1 + z_logvar - torch.pow(z_mean,2) - torch.exp(z_logvar))
     return mse + kld_f + kld_z
   
+
 #Necessary changes will be made to trainer after exact CNN architecture is finalised
 class Trainer(object):
     def __init__(self,model,device,trainloader,testloader,epochs,batch_size,learning_rate,checkpoints):
