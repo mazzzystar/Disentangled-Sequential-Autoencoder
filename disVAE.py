@@ -3,8 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
-class DisentangledVAE(nn.Module):
-    def __init__(self,params):
+class FullQDisentangledVAE(nn.Module):
         super(DisentangledVAE,self).__init__(self)
         self.f_dim = params['f_dim']
         self.z_dim = params['z_dim']
@@ -55,7 +54,7 @@ class DisentangledVAE(nn.Module):
         x = F.relu(self.bn4(self.conv4(x)))
         x = x.view(-1,4*4*256)
         x = F.relu(self.bnf(self.conv_fc(x))) 
-        return x.view(-1,self.frames,self.conv_dim)
+        return x.view(-1,self.frames,self.conv_dim) #Convert the stack batches back into frames
 
     def decode_frames(self,zf):
         x = F.relu(self.deconv_bnf(self.deconv_fc(zf)))
@@ -63,7 +62,8 @@ class DisentangledVAE(nn.Module):
         x = F.relu(self.dbn4(self.deconv4(x)))
         x = F.relu(self.dbn3(self.deconv3(x)))
         x = F.relu(self.dbn2(self.deconv2(x)))
-        return F.relu(self.dbn1(self.deconv1(x))) #If images are in 0,1 range use ReLU otherwise use tanh
+        x = F.relu(self.dbn1(self.deconv1(x))) #If images are in 0,1 range use ReLU otherwise use tanh
+        return x.view(-1.self.frames,3,64,64) #Convert the stacked batches back into frames
 
     def reparameterize(self,mean,logvar):
         if self.training:
@@ -76,12 +76,12 @@ class DisentangledVAE(nn.Module):
 
     def encode_f(self,x):
         lstm_out,_ = self.f_lstm(x)
-        mean = self.f_mean(lstm_out[:,self.seq_len-1])
-        logvar = self.f_logvar(lstm_out[:,self.seq_len-1])
+        mean = self.f_mean(lstm_out[:,self.frames-1]) #The forward and the reverse are already concatenated
+        logvar = self.f_logvar(lstm_out[:,self.frames-1]) # TODO: Check if its the correct forward and reverse
         return mean,logvar,self.reparameterize(mean,logvar)
     
     def encode_z(self,x,f):
-        f_expand = f.expand(x.size(0),f.size(0),f.size(1))
+        f_expand = f.unsqueeze(1).expand(-1,self.frames,self.f_dim)
         lstm_out,_ = self.z_lstm(torch.cat((x, f_expand), dim=2))
         rnn_out,_ = self.z_rnn(lstm_out)
         mean = self.z_mean(rnn_out)
@@ -92,16 +92,16 @@ class DisentangledVAE(nn.Module):
         conv_x = self.encode_frames(x)
         f_mean,f_logvar,f = self.encode_f(conv_x)
         z_mean,z_logvar,z = self.encode_z(conv_x,f)
-        f_expand = f.expand(z.size(0),f.size(0),f.size(1))
+        f_expand = f.unsqueeze(1).expand(-1,self.frames,self.f_dim)
         recon_x = self.decode_frames(torch.cat((z,f_expand),dim=2))
         return f_mean,f_logvar,f,z_mean,z_logvar,z,recon_x
 
-def loss_fn(original,recon,f_mean,f_logvar,z_mean,z_logvar,unroll_size):
-    mse = F.mse_loss(recon.view(-1,unroll_size),original.view(-1,unroll_size),size_average=False)
+def loss_fn(original_seq,recon_seq,f_mean,f_logvar,z_mean,z_logvar):
+    mse = F.mse_loss(recon_seq,original_seq,size_average=False);
     kld_f = -0.5 * torch.sum(1 + f_logvar - torch.pow(f_mean,2) - torch.exp(f_logvar))
     kld_z = -0.5 * torch.sum(1 + z_logvar - torch.pow(z_mean,2) - torch.exp(z_logvar))
     return mse + kld_f + kld_z
-
+  
 #Necessary changes will be made to trainer after exact CNN architecture is finalised
 class Trainer(object):
     def __init__(self,model,device,trainloader,testloader,epochs,batch_size,learning_rate,checkpoints):
