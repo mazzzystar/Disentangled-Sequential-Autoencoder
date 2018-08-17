@@ -2,6 +2,37 @@ import base64
 import time
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
+from PIL import Image
+import numpy as np
+import torch
+import torchvision
+import torchvision.transforms as transforms
+def prepare_tensor(path):
+    img = np.array(Image.open(path))
+    actions = {
+            'walk' : {
+                'range': [(9,10),(10,11),(11,12)],
+                'frames': [(0,1),(1,2),(2,3),(3,4),(4,5),(5,6),(6,7),(7,8)]
+                },
+            'spellcast': {
+                'range': [(1,2),(2,3),(3,4)],
+                'frames': [(0,1),(1,2),(2,3),(3,4),(4,5),(5,6),(6,7),(6,7)]
+                },
+            'slash': {
+                'range': [(14,15),(15,16),(16,17)],
+                'frames':  [(0,1),(1,2),(2,3),(3,4),(4,5),(5,6),(5,6),(5,6)]
+                }
+            }
+    slices = {}
+    for action,params in actions.items():
+        slices[action] = []
+        for row in params['range']:
+            sprite = []
+            for col in params['frames']:
+                sprite.append(transforms.functional.to_tensor(img[64*row[0]:64*row[1],64*col[0]:64*col[1],:]))
+            slices[action].append(torch.stack(sprite))
+        slices[action] = torch.stack(slices[action])
+    return torch.stack([slices['walk'],slices['spellcast'],slices['slash']])
 
 driver = webdriver.Firefox()
 driver.get("http://gaurav.munjal.us/Universal-LPC-Spritesheet-Character-Generator/")
@@ -23,6 +54,7 @@ shirts = ['longsleeve_brown','longsleeve_teal','longsleeve_maroon','longsleeve_w
 hairstyles = ['green','blue','pink','raven','white','dark_blonde']
 pants = ['magenta','red','teal','white','robe_skirt']
 count = 0
+data_set = []
 for body in bodies:
     driver.execute_script("return arguments[0].click();",driver.find_element_by_id('body-'+body))
     time.sleep(1)
@@ -45,7 +77,12 @@ for body in bodies:
                 canvas = driver.find_element_by_id('spritesheet')
                 canvas_base64 = driver.execute_script("return arguments[0].toDataURL('image/png').substring(21);",canvas)
                 canvas_png = base64.b64decode(canvas_base64)
-                with open(str(count-1) + ".png","wb") as f:
+                with open(str(name) + ".png","wb") as f:
                     f.write(canvas_png)
-
+                slices = prepare_tensor(str(name) + ".png")
+                data_set.append(slices)
+data_set = torch.stack(data_set)
+print("DataSet is Ready")
+print(data_set.shape)
+torch.save(data_set,"LPC_Sprites.dataset")
 
