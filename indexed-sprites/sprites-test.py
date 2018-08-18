@@ -54,22 +54,24 @@ shirts = ['longsleeve_brown','longsleeve_teal','longsleeve_maroon','longsleeve_w
 hairstyles = ['green','blue','pink','raven','white','dark_blonde']
 pants = ['magenta','red','teal','white','robe_skirt']
 count = 0
+batch = 0
+running_size = 0
 data_set = []
 for body in bodies:
     driver.execute_script("return arguments[0].click();",driver.find_element_by_id('body-'+body))
-    time.sleep(1)
+    time.sleep(0.5)
     for shirt in shirts:
         driver.execute_script("return arguments[0].click();",driver.find_element_by_id('clothes-'+shirt))
-        time.sleep(1)
+        time.sleep(0.5)
         for pant in pants:
             if pant=='robe_skirt':
                 driver.execute_script("return arguments[0].click();",driver.find_element_by_id('legs-'+pant))
             else:
                 driver.execute_script("return arguments[0].click();",driver.find_element_by_id('legs-pants_'+pant))
-            time.sleep(1)
+            time.sleep(0.5)
             for hair in hairstyles:
                 driver.execute_script("return arguments[0].click();",driver.find_element_by_id('hair-plain_'+hair))
-                time.sleep(1)
+                time.sleep(0.5)
                 name = body+"_"+shirt+"_"+pant+"_"+hair
                 count = count+1 
                 print("Creating character: "  + "'" + name)
@@ -81,8 +83,19 @@ for body in bodies:
                     f.write(canvas_png)
                 slices = prepare_tensor(str(name) + ".png")
                 data_set.append(slices)
-data_set = torch.stack(data_set)
-print("DataSet is Ready")
-print(data_set.shape)
-torch.save(data_set,"LPC_Sprites.dataset")
+                if len(data_set) > 127:
+                    batch += 1
+                    x = torch.stack(data_set)
+                    running_size += x.size(0)
+                    print("Saving Batch %d. Batch Dimensions : %s" % (batch,x.shape))
+                    torch.save(x,"./lpc-dataset/%d.batch" % batch)
+                    data_set = []
+if len(data_set) > 0:
+    batch += 1
+    running_size += x.size(0)
+    print("Saving Batch %d. Batch Dimensions : %s" % (batch,x.shape))
+    torch.save(x,"./lpc-dataset/%d.batch" % batch)
+    data_set = []
+
+print("DataSet is Ready. Size : %d" % running_size)
 

@@ -1,0 +1,9 @@
+Total 896 such batches
+Total : 896*128*9 
+Batch tensors are of shape (128,3,3,8,4,64,64)
+128 -> files
+3 -> actions(walk,spellcast,slash)
+3 -> viewing angle(leftwards,front facing,rightwards)
+4 -> channels in image
+64,64 -> image dimensions
+
