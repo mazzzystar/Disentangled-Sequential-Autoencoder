@@ -1,21 +1,29 @@
 import os
 import torch
+import torch.utils.data
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-
 class Sprites(torch.utils.data.Dataset):
+    def __init__(self,path):
+        self.path = path
+        self.length = 7560
 
+    def __len__(self):
+        return self.length
+        
+    def __getitem__(self,idx):
+        return torch.load(self.path+'/%d.sprite' % idx)
 
 class FullQDisentangledVAE(nn.Module):
-        super(DisentangledVAE,self).__init__(self)
-        self.f_dim = params['f_dim']
-        self.z_dim = params['z_dim']
-        self.frames = params['frames']
-        self.conv_dim = params['conv_dim']
-        self.hidden_dim = params['hidden_dim']
-        self.conv_params = params['conv']
-        self.deconv_params = params['deconv']
+    def __init__(self,frames,f_dim,z_dim,conv_dim,hidden_dim):
+        super(FullQDisentangledVAE,self).__init__()
+        self.f_dim = f_dim
+        self.z_dim = z_dim
+        self.frames = frames
+        self.conv_dim = conv_dim
+        self.hidden_dim = hidden_dim
+
         
         self.f_lstm = nn.LSTM(self.conv_dim, self.hidden_dim, 1,
                 bidirectional=True,batch_first=True)
@@ -28,11 +36,11 @@ class FullQDisentangledVAE(nn.Module):
         self.z_mean = nn.Linear(self.hidden_dim, self.z_dim)
         self.z_logvar = nn.Linear(self.hidden_dim, self.z_dim)
         
-        self.conv1 = nn.Conv2d(3,256,kernel_size=3,stride=2,padding=1)
+        self.conv1 = nn.Conv2d(4,256,kernel_size=3,stride=2,padding=1)
         self.bn1 = nn.BatchNorm2d(256)
         self.conv2 = nn.Conv2d(256,256,kernel_size=3,stride=2,padding=1)
         self.bn2 = nn.BatchNorm2d(256)
-        self.conv3 = nn.Conv2d(256.256.kernel_size=3,stride=2,padding=1)
+        self.conv3 = nn.Conv2d(256,256,kernel_size=3,stride=2,padding=1)
         self.bn3 = nn.BatchNorm2d(256)
         self.conv4 = nn.Conv2d(256,256,kernel_size=3,stride=2,padding=1)
         self.bn4 = nn.BatchNorm2d(256)
@@ -47,11 +55,11 @@ class FullQDisentangledVAE(nn.Module):
         self.dbn3 = nn.BatchNorm2d(256)
         self.deconv2 = nn.ConvTranspose2d(256,256,kernel_size=3,stride=2,padding=1,output_padding=1)
         self.dbn2 = nn.BatchNorm2d(256)
-        self.deconv1 = nn.ConvTranspose2d(256,3,kernel_size=3,stride=2,padding=1,output_padding=1)
-        self.dbn1 = nn.BatchNorm2d(3)
-        
+        self.deconv1 = nn.ConvTranspose2d(256,4,kernel_size=3,stride=2,padding=1,output_padding=1)
+        self.dbn1 = nn.BatchNorm2d(4)
+    
     def encode_frames(self,x):
-        x = x.view(-1,3,64,64) #Batchwise stack the 8 images for applying convolutions parallely
+        x = x.view(-1,4,64,64) #Batchwise stack the 8 images for applying convolutions parallely
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn2(self.conv2(x)))
         x = F.relu(self.bn3(self.conv3(x)))
@@ -67,7 +75,7 @@ class FullQDisentangledVAE(nn.Module):
         x = F.relu(self.dbn3(self.deconv3(x)))
         x = F.relu(self.dbn2(self.deconv2(x)))
         x = F.relu(self.dbn1(self.deconv1(x))) #If images are in 0,1 range use ReLU otherwise use tanh
-        return x.view(-1.self.frames,3,64,64) #Convert the stacked batches back into frames
+        return x.view(-1,self.frames,4,64,64) #Convert the stacked batches back into frames
 
     def reparameterize(self,mean,logvar):
         if self.training:
@@ -107,7 +115,6 @@ def loss_fn(original_seq,recon_seq,f_mean,f_logvar,z_mean,z_logvar):
     return mse + kld_f + kld_z
   
 
-#Necessary changes will be made to trainer after exact CNN architecture is finalised
 class Trainer(object):
     def __init__(self,model,device,trainloader,testloader,epochs,batch_size,learning_rate,checkpoints):
         self.trainloader = trainloader
@@ -144,13 +151,15 @@ class Trainer(object):
        self.model.train()
        for epoch in range(self.start_epoch,self.epochs):
            losses = []
+           i=0
            print("Running Epoch : {}".format(epoch))
-           for i,(data,_) in enumerate(self.trainloader):
+           for data in self.trainloader:
+               i += 1
                data = data.to(device)
                self.optimizer.zero_grad()
                #this part is VAE specific
-               recon_x,mean,logvar = self.model(data)
-               loss = kl_meansquare(data,recon_x,mean,logvar)
+               f_mean,f_logvar,f,z_mean,z_logvar,z = self.model(data)
+               loss = loss_fn(data,recon_x,f_mean,f_logvar,z_mean,z_logvar)
                loss.backward()
                self.optimizer.step()
                losses.append(loss.item())
@@ -158,3 +167,12 @@ class Trainer(object):
            print("Epoch {} : Average Loss: {}".format(epoch,np.mean(losses)))
            self.save_checkpoint(epoch) 
        print("Training is complete")
+
+vae = FullQDisentangledVAE(frames=8,f_dim=256,z_dim=32,hidden_dim=512,conv_dim=1024) #Adjust conv_dim on your own
+sprites_train = Sprites('./indexed-sprites/lpc-dataset')
+sprites_test = Sprites('./indexed-sprites/lpc-dataset')
+trainloader = torch.utils.data.DataLoader(sprites_train,batch_size=64,shuffle=True,num_workers=4)
+testloader = torch.utils.data.DataLoader(sprites_test,batch_size=64,shuffle=True,num_workers=4)
+device = torch.device('cuda:0')
+trainer = Trainer(vae,device,trainloader,testloader,epochs=50,batch_size=64,learning_rate=0.01,checkpoints='disentangled-vae.model') #Adjust the learning rate on your own
+trainer.train()
