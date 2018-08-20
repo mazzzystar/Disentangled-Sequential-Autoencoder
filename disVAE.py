@@ -69,7 +69,8 @@ class FullQDisentangledVAE(nn.Module):
         return x.view(-1,self.frames,self.conv_dim) #Convert the stack batches back into frames
 
     def decode_frames(self,zf):
-        x = F.relu(self.deconv_bnf(self.deconv_fc(zf)))
+        x = zf.view(-1,256*4*4) #For batchnorm1D to work, the frames should be stacked batchwise
+        x = F.relu(self.deconv_bnf(self.deconv_fc(x)))
         x = x.view(-1,256,4,4) #The 8 frames are stacked batchwise
         x = F.relu(self.dbn4(self.deconv4(x)))
         x = F.relu(self.dbn3(self.deconv3(x)))
