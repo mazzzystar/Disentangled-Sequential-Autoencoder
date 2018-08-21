@@ -1,0 +1,54 @@
+1534764266268	geckodriver	INFO	geckodriver 0.21.0
+1534764266273	geckodriver	INFO	Listening on 127.0.0.1:47123
+1534764267273	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.G0LZ9eFeOICJ"
+1534764269025	Marionette	INFO	Listening on port 38753
+1534764269084	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript warning: http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+1534764384615	geckodriver	INFO	geckodriver 0.21.0
+1534764384620	geckodriver	INFO	Listening on 127.0.0.1:48121
+1534764385627	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.PycrS5sA7pTg"
+1534764387392	Marionette	INFO	Listening on port 41109
+1534764387452	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript warning: http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+[Parent 19957, Gecko_IOThread] WARNING: pipe error (54): Connection reset by peer: file /build/firefox-mWstsA/firefox-61.0.1+build1/ipc/chromium/src/chrome/common/ipc_channel_posix.cc, line 353
+*** UTM:SVC TimerManager:registerTimer called after profile-before-change notification. Ignoring timer registration for id: telemetry_modules_ping
+1534764587582	geckodriver	INFO	geckodriver 0.21.0
+1534764587587	geckodriver	INFO	Listening on 127.0.0.1:41325
+1534764588593	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.93K26Tp1YTkX"
+1534764590405	Marionette	INFO	Listening on port 43981
+1534764590513	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript warning: http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+[Parent 20249, Gecko_IOThread] WARNING: pipe error (54): Connection reset by peer: file /build/firefox-mWstsA/firefox-61.0.1+build1/ipc/chromium/src/chrome/common/ipc_channel_posix.cc, line 353
+*** UTM:SVC TimerManager:registerTimer called after profile-before-change notification. Ignoring timer registration for id: telemetry_modules_ping
+1534764648709	geckodriver	INFO	geckodriver 0.21.0
+1534764648715	geckodriver	INFO	Listening on 127.0.0.1:56847
+1534764649722	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.B0U6R9HnfYxd"
+1534764651452	Marionette	INFO	Listening on port 45691
+1534764651538	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript warning: http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+JavaScript error: https://fbsbx.com/captcha/recaptcha/iframe/?referer=https%3A%2F%2Fwww.facebook.com, line 1: TypeError: o is null
+JavaScript error: https://fbsbx.com/captcha/recaptcha/iframe/?referer=https%3A%2F%2Fwww.facebook.com, line 1: TypeError: o is null
+JavaScript error: https://fbsbx.com/captcha/recaptcha/iframe/?referer=https%3A%2F%2Fwww.facebook.com, line 1: TypeError: o is null
+JavaScript error: https://fbsbx.com/captcha/recaptcha/iframe/?referer=https%3A%2F%2Fwww.facebook.com, line 1: TypeError: o is null
+JavaScript error: https://fbsbx.com/captcha/recaptcha/iframe/?referer=https%3A%2F%2Fwww.facebook.com, line 1: TypeError: o is null
+JavaScript error: https://fbsbx.com/captcha/recaptcha/iframe/?referer=https%3A%2F%2Fwww.facebook.com, line 1: TypeError: o is null
+JavaScript error: https://fbsbx.com/captcha/recaptcha/iframe/?referer=https%3A%2F%2Fwww.facebook.com, line 1: TypeError: o is null
+JavaScript error: https://fbsbx.com/captcha/recaptcha/iframe/?referer=https%3A%2F%2Fwww.facebook.com, line 1: TypeError: o is null
+JavaScript error: https://fbsbx.com/captcha/recaptcha/iframe/?referer=https%3A%2F%2Fwww.facebook.com, line 1: TypeError: o is null
+JavaScript error: https://fbsbx.com/captcha/recaptcha/iframe/?referer=https%3A%2F%2Fwww.facebook.com, line 1: TypeError: o is null
+JavaScript error: https://fbsbx.com/captcha/recaptcha/iframe/?referer=https%3A%2F%2Fwww.facebook.com, line 1: TypeError: o is null
+JavaScript error: https://fbsbx.com/captcha/recaptcha/iframe/?referer=https%3A%2F%2Fwww.facebook.com, line 1: TypeError: o is null
+JavaScript error: https://fbsbx.com/captcha/recaptcha/iframe/?referer=https%3A%2F%2Fwww.facebook.com, line 1: TypeError: o is null
+JavaScript error: https://fbsbx.com/captcha/recaptcha/iframe/?referer=https%3A%2F%2Fwww.facebook.com, line 1: TypeError: o is null
+JavaScript error: https://fbsbx.com/captcha/recaptcha/iframe/?referer=https%3A%2F%2Fwww.facebook.com, line 1: TypeError: o is null
+JavaScript error: https://fbsbx.com/captcha/recaptcha/iframe/?referer=https%3A%2F%2Fwww.facebook.com, line 1: TypeError: o is null
+JavaScript error: https://fbsbx.com/captcha/recaptcha/iframe/?referer=https%3A%2F%2Fwww.facebook.com, line 1: TypeError: o is null
+JavaScript error: https://fbsbx.com/captcha/recaptcha/iframe/?referer=https%3A%2F%2Fwww.facebook.com, line 1: TypeError: o is null
+JavaScript error: https://fbsbx.com/captcha/recaptcha/iframe/?referer=https%3A%2F%2Fwww.facebook.com, line 1: TypeError: o is null
+JavaScript error: https://fbsbx.com/captcha/recaptcha/iframe/?referer=https%3A%2F%2Fwww.facebook.com, line 1: TypeError: o is null
+JavaScript error: https://fbsbx.com/captcha/recaptcha/iframe/?referer=https%3A%2F%2Fwww.facebook.com, line 1: TypeError: o is null
+JavaScript error: https://fbsbx.com/captcha/recaptcha/iframe/?referer=https%3A%2F%2Fwww.facebook.com, line 1: TypeError: o is null
+JavaScript error: https://fbsbx.com/captcha/recaptcha/iframe/?referer=https%3A%2F%2Fwww.facebook.com, line 1: TypeError: o is null
+JavaScript error: https://fbsbx.com/captcha/recaptcha/iframe/?referer=https%3A%2F%2Fwww.facebook.com, line 1: TypeError: o is null
+JavaScript error: https://fbsbx.com/captcha/recaptcha/iframe/?referer=https%3A%2F%2Fwww.facebook.com, line 1: TypeError: o is null
+JavaScript error: https://fbsbx.com/captcha/recaptcha/iframe/?referer=https%3A%2F%2Fwww.facebook.com, line 1: TypeError: o is null
