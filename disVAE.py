@@ -1,5 +1,6 @@
 import os
 import torch
+import torchvision
 import torch.utils.data
 import torch.nn as nn
 import torch.nn.functional as F
@@ -57,6 +58,14 @@ class FullQDisentangledVAE(nn.Module):
         self.dbn2 = nn.BatchNorm2d(256)
         self.deconv1 = nn.ConvTranspose2d(256,4,kernel_size=3,stride=2,padding=1,output_padding=1)
         self.dbn1 = nn.BatchNorm2d(4)
+
+        for m in self.modules():
+            if isinstance(m,nn.BatchNorm2d) or isinstance(m,nn.BatchNorm1d):
+                nn.init.constant_(m.weight,1)
+                nn.init.constant_(m.bias,1)
+            elif isinstance(m,nn.Conv2d) or isinstance(m,nn.ConvTranspose2d) or isinstance(m,nn.Linear)
+                nn.init.kaiming_normal_(m.weight,nonlinearity='relu') #Change nonlinearity to 'leaky_relu' if you switch
+        nn.init.xavier_normal_(self.deconv1.weight,nn.init.calculate_gain('tanh'))
     
     def encode_frames(self,x):
         x = x.view(-1,4,64,64) #Batchwise stack the 8 images for applying convolutions parallely
@@ -79,7 +88,7 @@ class FullQDisentangledVAE(nn.Module):
         x = F.relu(self.dbn4(self.deconv4(x)))
         x = F.relu(self.dbn3(self.deconv3(x)))
         x = F.relu(self.dbn2(self.deconv2(x)))
-        x = F.relu(self.dbn1(self.deconv1(x))) #If images are in 0,1 range use ReLU otherwise use tanh
+        x = F.tanh(self.dbn1(self.deconv1(x))) #Images are normalized to -1,1 range hence use tanh 
         return x.view(-1,self.frames,4,64,64) #Convert the stacked batches back into frames
 
     def reparameterize(self,mean,logvar):
@@ -126,7 +135,7 @@ def loss_fn(original_seq,recon_seq,f_mean,f_logvar,z_mean,z_logvar):
   
 
 class Trainer(object):
-    def __init__(self,model,device,trainloader,testloader,epochs,batch_size,learning_rate,checkpoints):
+    def __init__(self,model,device,trainloader,testloader,epochs,batch_size,learning_rate,nsamples,sample_path,recon_path,checkpoints):
         self.trainloader = trainloader
         self.testloader = testloader
         self.start_epoch = 0
@@ -137,8 +146,11 @@ class Trainer(object):
         self.learning_rate = learning_rate
         self.checkpoints = checkpoints
         self.optimizer = optim.Adam(self.model.parameters(),self.learning_rate)
-        self.test_f = torch.randn(8,self.model.f_dim,device=self.device)
-        self.test_z = torch.randn(8,model.frames,model.z_dim,device=self.device)
+        self.samples = nsamples
+        self.sample_path = sample_path
+        self.recon_path = recon_path
+        self.test_f = torch.randn(self.samples,self.model.f_dim,device=self.device)
+        self.test_z = torch.randn(self.samples,model.frames,model.z_dim,device=self.device)
         f_expand = self.test_f.unsqueeze(1).expand(-1,model.frames,model.f_dim)
         self.test_zf = torch.cat((self.test_z,f_expand),dim=2)
     
@@ -161,7 +173,16 @@ class Trainer(object):
             print("No Checkpoint Exists At '{}'.Start Fresh Training".format(self.checkpoints))
             self.start_epoch = 0
 
-            
+    def sample_frames(self,epoch):
+        with torch.no_grad():
+           recon_x = self.model.decode_frames(self.test_zf) 
+           torchvision.utils.save_image(recon_x,'%s/epoch%d.png' % (self.sample_path,epoch))
+    
+    def recon_frame(self,original):
+        with torch.no_grad():
+            _,_,_,_,_,_,recon_x = self.model(original) 
+            image = torch.cat((original,recon),dim=0)
+            torchvision.utils.save_image(image,'%s/epoch%d.png' % (self.recon_path,epoch))
 
     def train(self):
        self.model.train()
@@ -175,7 +196,7 @@ class Trainer(object):
                print("Size of input data {}".format(data.shape))
                self.optimizer.zero_grad()
                #this part is VAE specific
-               f_mean,f_logvar,f,z_mean,z_logvar,z = self.model(data)
+               f_mean,f_logvar,f,z_mean,z_logvar,z,recon_x = self.model(data)
                loss = loss_fn(data,recon_x,f_mean,f_logvar,z_mean,z_logvar)
                loss.backward()
                self.optimizer.step()

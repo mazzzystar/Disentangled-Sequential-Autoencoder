@@ -6,6 +6,7 @@ from PIL import Image
 import numpy as np
 import torch
 import torchvision.transforms as transforms
+slice_transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.5,0.5,0.5),(0.5,0.5,0.5))])
 def prepare_tensor(path):
     img = np.array(Image.open(path))
     actions = {
@@ -27,7 +28,7 @@ def prepare_tensor(path):
         for row in params['range']:
             sprite = []
             for col in params['frames']:
-                sprite.append(transforms.functional.to_tensor(img[64*row[0]:64*row[1],64*col[0]:64*col[1],:]))
+                sprite.append(slice_transform(img[64*row[0]:64*row[1],64*col[0]:64*col[1],:]))
             slices.append(torch.stack(sprite))
     return slices 
 
