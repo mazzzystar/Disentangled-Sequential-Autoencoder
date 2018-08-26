@@ -40,7 +40,8 @@ bodies = ['light','dark','dark2','darkelf','darkelf2','tanned','tanned2']
 shirts = ['longsleeve_brown','longsleeve_teal','longsleeve_maroon','longsleeve_white']
 hairstyles = ['green','blue','pink','raven','white','dark_blonde']
 pants = ['magenta','red','teal','white','robe_skirt']
-count = 0
+train = 0
+test = 0
 for body in bodies:
     driver.execute_script("return arguments[0].click();",driver.find_element_by_id('body-'+body))
     time.sleep(0.5)
@@ -64,11 +65,19 @@ for body in bodies:
                 with open(str(name) + ".png","wb") as f:
                     f.write(canvas_png)
                 slices = prepare_tensor(str(name) + ".png")
-                for sprites in slices:
-                    count += 1
-                    print('Saving %d.sprite' % count)
-                    torch.save(sprites,'./lpc-dataset/%d.sprite' % count)
+                p = torch.rand(1).item() <= 0.1 #Randomly add 10% of the characters created in the test set
+                if p is True:
+                    for sprites in slices:
+                        test += 1
+                        print('Saving %d.sprite in test set' % test)
+                        torch.save(sprites,'./lpc-dataset/test/%d.sprite' % test)
+                else:
+                    for sprites in slices:
+                        train += 1
+                        print('Saving %d.sprite in train set' % train)
+                        torch.save(sprites,'./lpc-dataset/train/%d.sprite' % train)
+ 
 
 
-print("DataSet is Ready. Size : %d" % count)
+print("Dataset is Ready.Training Set Size : %d. Test Set Size : %d " % (train,test))
 
