@@ -60,21 +60,21 @@ class FullQDisentangledVAE(nn.Module):
     
     def encode_frames(self,x):
         x = x.view(-1,4,64,64) #Batchwise stack the 8 images for applying convolutions parallely
+        print("After stacking frames batchwise : {}".format(x.shape))
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn2(self.conv2(x)))
         x = F.relu(self.bn3(self.conv3(x)))
         x = F.relu(self.bn4(self.conv4(x)))
         x = x.view(-1,4*4*256)
         x = F.relu(self.bnf(self.conv_fc(x))) 
-        return x.view(-1,self.frames,self.conv_dim) #Convert the stack batches back into frames
+        x = x.view(-1,self.frames,self.conv_dim)
+        print("After creating vector sequence and unstacking : {}".format(x.shape))
+        return x
 
     def decode_frames(self,zf):
-        print(zf.shape)
-        x = zf.view(64*8,-1)#For batchnorm1D to work, the frames should be stacked batchwise
-        print(x.shape)
-        x=self.deconv_fc(x)
-        print(x.shape)
-        x = F.relu(self.deconv_bnf(x))
+        x = zf.view(-1,self.f_dim+self.z_dim) #For batchnorm1D to work, the frames should be stacked batchwise
+        print('After stacking the frames batchwise : {}'.format(x.shape))
+        x = F.relu(self.deconv_bnf(self.deconv_fc(x)))
         x = x.view(-1,256,4,4) #The 8 frames are stacked batchwise
         x = F.relu(self.dbn4(self.deconv4(x)))
         x = F.relu(self.dbn3(self.deconv3(x)))
@@ -95,6 +95,7 @@ class FullQDisentangledVAE(nn.Module):
         lstm_out,_ = self.f_lstm(x)
         mean = self.f_mean(lstm_out[:,self.frames-1]) #The forward and the reverse are already concatenated
         logvar = self.f_logvar(lstm_out[:,self.frames-1]) # TODO: Check if its the correct forward and reverse
+        #print("Mean shape for f : {}".format(mean.shape))
         return mean,logvar,self.reparameterize(mean,logvar)
     
     def encode_z(self,x,f):
@@ -108,9 +109,13 @@ class FullQDisentangledVAE(nn.Module):
     def forward(self,x):
         conv_x = self.encode_frames(x)
         f_mean,f_logvar,f = self.encode_f(conv_x)
+        print('Dimensions of f : {}'.format(f.shape))
         z_mean,z_logvar,z = self.encode_z(conv_x,f)
+        print('Dimensions of z : {}'.format(z.shape))
         f_expand = f.unsqueeze(1).expand(-1,self.frames,self.f_dim)
-        recon_x = self.decode_frames(torch.cat((z,f_expand),dim=2))
+        zf = torch.cat((z,f_expand),dim=2)
+        print('Dimensions after concatenating z and f : {}'.format(zf.shape))
+        recon_x = self.decode_frames(zf)
         return f_mean,f_logvar,f,z_mean,z_logvar,z,recon_x
 
 def loss_fn(original_seq,recon_seq,f_mean,f_logvar,z_mean,z_logvar):
@@ -132,7 +137,11 @@ class Trainer(object):
         self.learning_rate = learning_rate
         self.checkpoints = checkpoints
         self.optimizer = optim.Adam(self.model.parameters(),self.learning_rate)
-        
+        self.test_f = torch.randn(8,self.model.f_dim,device=self.device)
+        self.test_z = torch.randn(8,model.frames,model.z_dim,device=self.device)
+        f_expand = self.test_f.unsqueeze(1).expand(-1,model.frames,model.f_dim)
+        self.test_zf = torch.cat((self.test_z,f_expand),dim=2)
+    
     def save_checkpoint(self,epoch):
         torch.save({
             'epoch' : epoch+1,
@@ -152,6 +161,8 @@ class Trainer(object):
             print("No Checkpoint Exists At '{}'.Start Fresh Training".format(self.checkpoints))
             self.start_epoch = 0
 
+            
+
     def train(self):
        self.model.train()
        for epoch in range(self.start_epoch,self.epochs):
@@ -161,9 +172,10 @@ class Trainer(object):
            for data in self.trainloader:
                i += 1
                data = data.to(device)
+               print("Size of input data {}".format(data.shape))
                self.optimizer.zero_grad()
                #this part is VAE specific
-               f_mean,f_logvar,f,z_mean,z_logvar,z,recon_x = self.model(data)
+               f_mean,f_logvar,f,z_mean,z_logvar,z = self.model(data)
                loss = loss_fn(data,recon_x,f_mean,f_logvar,z_mean,z_logvar)
                loss.backward()
                self.optimizer.step()
