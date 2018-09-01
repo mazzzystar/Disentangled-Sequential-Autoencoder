@@ -1,5 +1,4 @@
 from tqdm import *
-import os
 import torch
 import torchvision
 import torch.utils.data
@@ -39,7 +38,6 @@ class FullQDisentangledVAE(nn.Module):
         self.z_logvar = nn.Linear(self.hidden_dim, self.z_dim)
         
         self.conv1 = nn.Conv2d(4,256,kernel_size=3,stride=2,padding=1)
-        self.bn1 = nn.BatchNorm2d(256)
         self.conv2 = nn.Conv2d(256,256,kernel_size=3,stride=2,padding=1)
         self.bn2 = nn.BatchNorm2d(256)
         self.conv3 = nn.Conv2d(256,256,kernel_size=3,stride=2,padding=1)
@@ -58,7 +56,6 @@ class FullQDisentangledVAE(nn.Module):
         self.deconv2 = nn.ConvTranspose2d(256,256,kernel_size=3,stride=2,padding=1,output_padding=1)
         self.dbn2 = nn.BatchNorm2d(256)
         self.deconv1 = nn.ConvTranspose2d(256,4,kernel_size=3,stride=2,padding=1,output_padding=1)
-        self.dbn1 = nn.BatchNorm2d(4)
 
         for m in self.modules():
             if isinstance(m,nn.BatchNorm2d) or isinstance(m,nn.BatchNorm1d):
@@ -70,7 +67,7 @@ class FullQDisentangledVAE(nn.Module):
     
     def encode_frames(self,x):
         x = x.view(-1,4,64,64) #Batchwise stack the 8 images for applying convolutions parallely
-        x = F.relu(self.bn1(self.conv1(x)))
+        x = F.relu(self.conv1(x)) #Remove batchnorm, the encoder must learn the data distribution
         x = F.relu(self.bn2(self.conv2(x)))
         x = F.relu(self.bn3(self.conv3(x)))
         x = F.relu(self.bn4(self.conv4(x)))
@@ -86,7 +83,7 @@ class FullQDisentangledVAE(nn.Module):
         x = F.relu(self.dbn4(self.deconv4(x)))
         x = F.relu(self.dbn3(self.deconv3(x)))
         x = F.relu(self.dbn2(self.deconv2(x)))
-        x = F.tanh(self.dbn1(self.deconv1(x))) #Images are normalized to -1,1 range hence use tanh 
+        x = F.tanh(self.deconv1(x)) #Images are normalized to -1,1 range hence use tanh. Remove batchnorm because it should fit the final distribution 
         return x.view(-1,self.frames,4,64,64) #Convert the stacked batches back into frames
 
     def reparameterize(self,mean,logvar):
