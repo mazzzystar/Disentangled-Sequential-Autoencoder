@@ -1,6 +1,0 @@
-1534760832954	geckodriver	INFO	geckodriver 0.21.0
-1534760832959	geckodriver	INFO	Listening on 127.0.0.1:58079
-1534760833970	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.jnD2UYy6awRu"
-1534760835703	Marionette	INFO	Listening on port 41405
-1534760835783	Marionette	WARN	TLS certificate errors will be ignored for this session
-JavaScript warning: http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead

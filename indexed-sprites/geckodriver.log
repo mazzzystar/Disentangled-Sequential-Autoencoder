@@ -52,3 +52,16 @@ JavaScript error: https://fbsbx.com/captcha/recaptcha/iframe/?referer=https%3A%2
 JavaScript error: https://fbsbx.com/captcha/recaptcha/iframe/?referer=https%3A%2F%2Fwww.facebook.com, line 1: TypeError: o is null
 JavaScript error: https://fbsbx.com/captcha/recaptcha/iframe/?referer=https%3A%2F%2Fwww.facebook.com, line 1: TypeError: o is null
 JavaScript error: https://fbsbx.com/captcha/recaptcha/iframe/?referer=https%3A%2F%2Fwww.facebook.com, line 1: TypeError: o is null
+1535813418882	geckodriver	INFO	geckodriver 0.21.0
+1535813418889	geckodriver	INFO	Listening on 127.0.0.1:34987
+1535813419888	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.i9MZHtxIvtzE"
+1535813421380	Marionette	INFO	Listening on port 43865
+1535813421396	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript warning: http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js, line 1: Using //@ to indicate sourceMappingURL pragmas is deprecated. Use //# instead
+1535832114957	geckodriver	INFO	geckodriver 0.21.0
+1535832114961	geckodriver	INFO	Listening on 127.0.0.1:34633
+1535832115968	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.5B8TLJfpMa5x"
+1535832117483	Marionette	INFO	Listening on port 33707
+1535832117590	Marionette	WARN	TLS certificate errors will be ignored for this session
+[Parent 23817, Gecko_IOThread] WARNING: pipe error (55): Connection reset by peer: file /build/firefox-mWstsA/firefox-61.0.1+build1/ipc/chromium/src/chrome/common/ipc_channel_posix.cc, line 353
+*** UTM:SVC TimerManager:registerTimer called after profile-before-change notification. Ignoring timer registration for id: telemetry_modules_ping

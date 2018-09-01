@@ -1,10 +1,11 @@
-from tqdm import *
 import torch
 import torchvision
 import torch.utils.data
 import torch.nn as nn
 import torch.nn.functional as F
+import torch.nn.init
 import torch.optim as optim
+import numpy as np
 class Sprites(torch.utils.data.Dataset):
     def __init__(self,path,size):
         self.path = path
@@ -14,7 +15,7 @@ class Sprites(torch.utils.data.Dataset):
         return self.length
         
     def __getitem__(self,idx):
-        return torch.load(self.path+'/%d.sprite' % idx)
+        return torch.load(self.path+'/%d.sprite' % (idx+1))
 
 class FullQDisentangledVAE(nn.Module):
     def __init__(self,frames,f_dim,z_dim,conv_dim,hidden_dim):
@@ -187,7 +188,7 @@ class Trainer(object):
        for epoch in range(self.start_epoch,self.epochs):
            losses = []
            print("Running Epoch : {}".format(epoch))
-           for i,data in tqdm(enumerate(self.trainloader,1)):
+           for i,data in enumerate(self.trainloader,1):
                data = data.to(device)
                self.optimizer.zero_grad()
                f_mean,f_logvar,f,z_mean,z_logvar,z,recon_x = self.model(data)
@@ -210,8 +211,8 @@ class Trainer(object):
 
 if __name__ == '__main__':
     vae = FullQDisentangledVAE(frames=8,f_dim=256,z_dim=32,hidden_dim=512,conv_dim=1024) 
-    sprites_train = Sprites('./indexed-sprites/lpc-dataset/train/',6858)
-    sprites_test = Sprites('./indexed-sprites/lpc-dataset/test/',702)
+    sprites_train = Sprites('./indexed-sprites/lpc-dataset/train/', 6687)
+    sprites_test = Sprites('./indexed-sprites/lpc-dataset/test/',873)
     trainloader = torch.utils.data.DataLoader(sprites_train,batch_size=64,shuffle=True,num_workers=4) 
     testloader = torch.utils.data.DataLoader(sprites_test,batch_size=1,shuffle=True,num_workers=4)
     device = torch.device('cuda:0')
