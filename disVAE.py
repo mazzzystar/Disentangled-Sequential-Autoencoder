@@ -84,7 +84,7 @@ class FullQDisentangledVAE(nn.Module):
         x = F.relu(self.dbn4(self.deconv4(x)))
         x = F.relu(self.dbn3(self.deconv3(x)))
         x = F.relu(self.dbn2(self.deconv2(x)))
-        x = F.tanh(self.deconv1(x)) #Images are normalized to -1,1 range hence use tanh. Remove batchnorm because it should fit the final distribution 
+        x = torch.tanh(self.deconv1(x)) #Images are normalized to -1,1 range hence use tanh. Remove batchnorm because it should fit the final distribution 
         return x.view(-1,self.frames,3,64,64) #Convert the stacked batches back into frames. Images are 64*64*3
 
     def reparameterize(self,mean,logvar):
@@ -121,7 +121,7 @@ class FullQDisentangledVAE(nn.Module):
         return f_mean,f_logvar,f,z_mean,z_logvar,z,recon_x
 
 def loss_fn(original_seq,recon_seq,f_mean,f_logvar,z_mean,z_logvar):
-    mse = F.mse_loss(recon_seq,original_seq,size_average=False);
+    mse = F.mse_loss(recon_seq,original_seq,reduction='sum');
     kld_f = -0.5 * torch.sum(1 + f_logvar - torch.pow(f_mean,2) - torch.exp(f_logvar))
     kld_z = -0.5 * torch.sum(1 + z_logvar - torch.pow(z_mean,2) - torch.exp(z_logvar))
     return mse + kld_f + kld_z
@@ -175,12 +175,12 @@ class Trainer(object):
     def sample_frames(self,epoch):
         with torch.no_grad():
            recon_x = self.model.decode_frames(self.test_zf) 
-           recon_x = recon_x.view(16,4,64,64)
+           recon_x = recon_x.view(16,3,64,64)
            torchvision.utils.save_image(recon_x,'%s/epoch%d.png' % (self.sample_path,epoch))
     
     def recon_frame(self,epoch,original):
         with torch.no_grad():
-            _,_,_,_,_,_,recon_x = self.model(original) 
+            _,_,_,_,_,_,recon = self.model(original) 
             image = torch.cat((original,recon),dim=0)
             torchvision.utils.save_image(image,'%s/epoch%d.png' % (self.recon_path,epoch))
 
@@ -188,7 +188,7 @@ class Trainer(object):
        self.model.train()
        for epoch in range(self.start_epoch,self.epochs):
            losses = []
-           print("Running Epoch : {}".format(epoch))
+           print("Running Epoch : {}".format(epoch+1))
            for i,data in enumerate(self.trainloader,1):
                data = data.to(device)
                self.optimizer.zero_grad()
@@ -197,16 +197,16 @@ class Trainer(object):
                loss.backward()
                self.optimizer.step()
                losses.append(loss.item())
-           print(len(losses) == self.batch_size)
            meanloss = np.mean(losses)
            self.epoch_losses.append(meanloss)
-           print("Epoch {} : Average Loss: {}".format(epoch,meanloss))
+           print("Epoch {} : Average Loss: {}".format(epoch+1,meanloss))
            self.save_checkpoint(epoch) 
            self.model.eval()
-           self.sample_frames(epoch)
+           self.sample_frames(epoch+1)
            sample = self.test[int(torch.randint(0,len(self.test),(1,)).item())]
            sample = torch.unsqueeze(sample,0)
-           self.recon_frame(epoch,sample)
+           sample = sample.to(self.device)
+           self.recon_frame(epoch+1,sample)
            self.model.train()
        print("Training is complete")
 
@@ -217,6 +217,7 @@ if __name__ == '__main__':
     trainloader = torch.utils.data.DataLoader(sprites_train,batch_size=64,shuffle=True,num_workers=4) 
     testloader = torch.utils.data.DataLoader(sprites_test,batch_size=1,shuffle=True,num_workers=4)
     device = torch.device('cuda:0')
-    trainer = Trainer(vae,device,sprites_train,sprites_test,trainloader,testloader,epochs=200,batch_size=64,learning_rate=0.01,checkpoints='disentangled-vae.model',nsamples = 2,sample_path='./samples',
+    trainer = Trainer(vae,device,sprites_train,sprites_test,trainloader,testloader,epochs=300,batch_size=64,learning_rate=0.0001,checkpoints='disentangled-vae.model',nsamples = 2,sample_path='./samples',
             recon_path='./recon') 
+    trainer.load_checkpoint()
     trainer.train_model()
