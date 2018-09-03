@@ -38,17 +38,17 @@ class FullQDisentangledVAE(nn.Module):
         self.z_mean = nn.Linear(self.hidden_dim, self.z_dim)
         self.z_logvar = nn.Linear(self.hidden_dim, self.z_dim)
         
-        self.conv1 = nn.Conv2d(4,256,kernel_size=3,stride=2,padding=1)
+        self.conv1 = nn.Conv2d(3,256,kernel_size=3,stride=2,padding=1)
         self.conv2 = nn.Conv2d(256,256,kernel_size=3,stride=2,padding=1)
         self.bn2 = nn.BatchNorm2d(256)
         self.conv3 = nn.Conv2d(256,256,kernel_size=3,stride=2,padding=1)
         self.bn3 = nn.BatchNorm2d(256)
         self.conv4 = nn.Conv2d(256,256,kernel_size=3,stride=2,padding=1)
         self.bn4 = nn.BatchNorm2d(256)
-        self.conv_fc = nn.Linear(4*4*256,self.conv_dim)
+        self.conv_fc = nn.Linear(4*4*256,self.conv_dim) #4*4 is size 256 is channels
         self.bnf = nn.BatchNorm1d(self.conv_dim) 
 
-        self.deconv_fc = nn.Linear(self.f_dim+self.z_dim,4*4*256)
+        self.deconv_fc = nn.Linear(self.f_dim+self.z_dim,4*4*256) #4*4 is size 256 is channels
         self.deconv_bnf = nn.BatchNorm1d(4*4*256)
         self.deconv4 = nn.ConvTranspose2d(256,256,kernel_size=3,stride=2,padding=1,output_padding=1)
         self.dbn4 = nn.BatchNorm2d(256)
@@ -56,7 +56,7 @@ class FullQDisentangledVAE(nn.Module):
         self.dbn3 = nn.BatchNorm2d(256)
         self.deconv2 = nn.ConvTranspose2d(256,256,kernel_size=3,stride=2,padding=1,output_padding=1)
         self.dbn2 = nn.BatchNorm2d(256)
-        self.deconv1 = nn.ConvTranspose2d(256,4,kernel_size=3,stride=2,padding=1,output_padding=1)
+        self.deconv1 = nn.ConvTranspose2d(256,3,kernel_size=3,stride=2,padding=1,output_padding=1)
 
         for m in self.modules():
             if isinstance(m,nn.BatchNorm2d) or isinstance(m,nn.BatchNorm1d):
@@ -67,12 +67,12 @@ class FullQDisentangledVAE(nn.Module):
         nn.init.xavier_normal_(self.deconv1.weight,nn.init.calculate_gain('tanh'))
     
     def encode_frames(self,x):
-        x = x.view(-1,4,64,64) #Batchwise stack the 8 images for applying convolutions parallely
+        x = x.view(-1,3,64,64) #Batchwise stack the 8 images for applying convolutions parallely
         x = F.relu(self.conv1(x)) #Remove batchnorm, the encoder must learn the data distribution
         x = F.relu(self.bn2(self.conv2(x)))
         x = F.relu(self.bn3(self.conv3(x)))
         x = F.relu(self.bn4(self.conv4(x)))
-        x = x.view(-1,4*4*256)
+        x = x.view(-1,4*4*256) #4*4 is size 256 is channels
         x = F.relu(self.bnf(self.conv_fc(x))) 
         x = x.view(-1,self.frames,self.conv_dim)
         return x
@@ -85,7 +85,7 @@ class FullQDisentangledVAE(nn.Module):
         x = F.relu(self.dbn3(self.deconv3(x)))
         x = F.relu(self.dbn2(self.deconv2(x)))
         x = F.tanh(self.deconv1(x)) #Images are normalized to -1,1 range hence use tanh. Remove batchnorm because it should fit the final distribution 
-        return x.view(-1,self.frames,4,64,64) #Convert the stacked batches back into frames
+        return x.view(-1,self.frames,3,64,64) #Convert the stacked batches back into frames. Images are 64*64*3
 
     def reparameterize(self,mean,logvar):
         if self.training:
