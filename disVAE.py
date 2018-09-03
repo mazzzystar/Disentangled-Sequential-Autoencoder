@@ -175,6 +175,7 @@ class Trainer(object):
     def sample_frames(self,epoch):
         with torch.no_grad():
            recon_x = self.model.decode_frames(self.test_zf) 
+           recon_x = recon_x.view(16,4,64,64)
            torchvision.utils.save_image(recon_x,'%s/epoch%d.png' % (self.sample_path,epoch))
     
     def recon_frame(self,epoch,original):
@@ -203,7 +204,7 @@ class Trainer(object):
            self.save_checkpoint(epoch) 
            self.model.eval()
            self.sample_frames(epoch)
-           sample = self.test[int(torch.randint(0,len(self.test),1).item())]
+           sample = self.test[int(torch.randint(0,len(self.test),(1,)).item())]
            sample = torch.unsqueeze(sample,0)
            self.recon_frame(epoch,sample)
            self.model.train()
