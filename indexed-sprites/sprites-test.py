@@ -8,7 +8,9 @@ import torch
 import torchvision.transforms as transforms
 slice_transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.5,0.5,0.5),(0.5,0.5,0.5))])
 def prepare_tensor(path):
-    img = np.array(Image.open(path))
+    img = Image.open(path)
+    img = img.convert("RGB")
+    img = np.array(img)
     actions = {
             'walk' : {
                 'range': [(9,10),(10,11),(11,12)],
@@ -65,6 +67,7 @@ for body in bodies:
                 with open(str(name) + ".png","wb") as f:
                     f.write(canvas_png)
                 slices = prepare_tensor(str(name) + ".png")
+                print("Dimension is {}".format(slices[0].shape))
                 p = torch.rand(1).item() <= 0.1 #Randomly add 10% of the characters created in the test set
                 if p is True:
                     for sprites in slices:
