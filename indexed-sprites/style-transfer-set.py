@@ -70,7 +70,7 @@ for body in tqdm(bodies):
                 canvas_png = base64.b64decode(canvas_base64)
                 with open(str(name) + ".png","wb") as f:
                     f.write(canvas_png)
-                save_path = './style-transfer/{}/{}/{}'.format(shirt,pant,hair)
+                save_path = './style-transfer/{}/{}/{}/{}'.format(body,shirt,pant,hair)
                 slices = prepare_tensor(str(name) + ".png",save_path)
  
 
