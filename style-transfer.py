@@ -31,7 +31,7 @@ image1_body_image2_motion = vae.decode_frames(image1swap_zf)
 image1_body_image2_motion = torch.squeeze(image1_body_image2_motion,0)
 
 image2swap_zf = torch.cat((image1_z,image2_f_expand),dim=2)
-image2_body_image1_motion = vae.decode_frames(image1swap_zf)
+image2_body_image1_motion = vae.decode_frames(image2swap_zf)
 image2_body_image1_motion = torch.squeeze(image2_body_image1_motion,0)
 
 torchvision.utils.save_image(image1_body_image2_motion,'image1_body_image2_motion.png')
