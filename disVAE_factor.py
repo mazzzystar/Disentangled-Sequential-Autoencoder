@@ -35,7 +35,7 @@ class FullQDisentangledVAE(nn.Module):
         self.f_logvar_drop = nn.Dropout(0.3)
         self.f_logvar = nn.Linear(self.hidden_dim*2, self.f_dim)
 
-        self.z_lstm = nn.LSTM(self.conv_dim+self.f_dim, self.hidden_dim, 1,
+        self.z_lstm = nn.LSTM(self.conv_dim, self.hidden_dim, 1,
                  bidirectional=True,batch_first=True)
         self.z_rnn = nn.RNN(self.hidden_dim*2, self.hidden_dim,batch_first=True) 
         self.z_mean = nn.Linear(self.hidden_dim, self.z_dim)
@@ -116,9 +116,9 @@ class FullQDisentangledVAE(nn.Module):
         #print("Mean shape for f : {}".format(mean.shape))
         return mean,logvar,self.reparameterize(mean,logvar)
     
-    def encode_z(self,x,f):
+    def encode_z(self,x):
         f_expand = f.unsqueeze(1).expand(-1,self.frames,self.f_dim)
-        lstm_out,_ = self.z_lstm(torch.cat((x, f_expand), dim=2))
+        lstm_out,_ = self.z_lstm(x)
         rnn_out,_ = self.z_rnn(lstm_out)
         mean = self.z_mean(self.z_mean_drop(rnn_out))
         logvar = self.z_logvar(self.z_logvar_drop(rnn_out))
@@ -127,7 +127,7 @@ class FullQDisentangledVAE(nn.Module):
     def forward(self,x):
         conv_x = self.encode_frames(x)
         f_mean,f_logvar,f = self.encode_f(conv_x)
-        z_mean,z_logvar,z = self.encode_z(conv_x,f)
+        z_mean,z_logvar,z = self.encode_z(conv_x)
         f_expand = f.unsqueeze(1).expand(-1,self.frames,self.f_dim)
         zf = torch.cat((z,f_expand),dim=2)
         recon_x = self.decode_frames(zf)
@@ -196,13 +196,13 @@ class Trainer(object):
         with torch.no_grad():
            recon_x = self.model.decode_frames(self.test_zf) 
            recon_x = recon_x.view(16,3,64,64)
-           torchvision.utils.save_image(recon_x,'./Full/%s/epoch%d.png' % (self.sample_path,epoch))
+           torchvision.utils.save_image(recon_x,'./Factorised/%s/epoch%d.png' % (self.sample_path,epoch))
     
     def recon_frame(self,epoch,original):
         with torch.no_grad():
             _,_,_,_,_,_,recon = self.model(original) 
             image = torch.cat((original,recon),dim=0)
-            torchvision.utils.save_image(image,'./Full/%s/epoch%d.png' % (self.recon_path,epoch))
+            torchvision.utils.save_image(image,'./Factorised/%s/epoch%d.png' % (self.recon_path,epoch))
 
     def style_transfer(self,epoch):
         with torch.no_grad():
@@ -221,8 +221,8 @@ class Trainer(object):
             image2_body_image1_motion = self.model.decode_frames(image2swap_zf)
             image2_body_image1_motion = self.model.squeeze(image2_body_image1_motion,0)
 
-            torchvision.utils.save_image(image1_body_image2_motion,'./Full/transfer/epoch%d/image1_body_image2_motion' % epoch)
-            torchvision.utils.save_image(image2_body_image1_motion,'./Full/transfer/epoch%d/image2_body_image1_motion' % epoch)
+            torchvision.utils.save_image(image1_body_image2_motion,'./Factorised/transfer/epoch%d/image1_body_image2_motion' % epoch)
+            torchvision.utils.save_image(image2_body_image1_motion,'./Factorised/transfer/epoch%d/image2_body_image1_motion' % epoch)
 
 
 
