@@ -31,8 +31,8 @@ class FullQDisentangledVAE(nn.Module):
         self.f_lstm = nn.LSTM(self.conv_dim, self.hidden_dim, 1,
                 bidirectional=True,batch_first=True)
         self.f_mean = nn.Linear(self.hidden_dim*2, self.f_dim)
-        self.f_mean_drop = nn.Dropout(0.3)
-        self.f_logvar_drop = nn.Dropout(0.3)
+        self.f_mean_drop = nn.Dropout(0.5)
+        self.f_logvar_drop = nn.Dropout(0.5)
         self.f_logvar = nn.Linear(self.hidden_dim*2, self.f_dim)
 
         self.z_lstm = nn.LSTM(self.conv_dim+self.f_dim, self.hidden_dim, 1,
@@ -40,35 +40,35 @@ class FullQDisentangledVAE(nn.Module):
         self.z_rnn = nn.RNN(self.hidden_dim*2, self.hidden_dim,batch_first=True) 
         self.z_mean = nn.Linear(self.hidden_dim, self.z_dim)
         self.z_logvar = nn.Linear(self.hidden_dim, self.z_dim)
-        self.z_mean_drop = nn.Dropout(0.3)
-        self.z_logvar_drop = nn.Dropout(0.3)
+        self.z_mean_drop = nn.Dropout(0.5)
+        self.z_logvar_drop = nn.Dropout(0.5)
         
         self.conv1 = nn.Conv2d(3,256,kernel_size=4,stride=2,padding=1)
         self.conv2 = nn.Conv2d(256,256,kernel_size=4,stride=2,padding=1)
         self.bn2 = nn.BatchNorm2d(256)
-        self.drop2 = nn.Dropout2d(0.3)
+        self.drop2 = nn.Dropout2d(0.5)
         self.conv3 = nn.Conv2d(256,256,kernel_size=4,stride=2,padding=1)
         self.bn3 = nn.BatchNorm2d(256)
-        self.drop3 = nn.Dropout2d(0.3)
+        self.drop3 = nn.Dropout2d(0.5)
         self.conv4 = nn.Conv2d(256,256,kernel_size=4,stride=2,padding=1)
         self.bn4 = nn.BatchNorm2d(256)
-        self.drop4 = nn.Dropout2d(0.3)
+        self.drop4 = nn.Dropout2d(0.5)
         self.conv_fc = nn.Linear(4*4*256,self.conv_dim) #4*4 is size 256 is channels
-        self.drop_fc = nn.Dropout(0.3)
+        self.drop_fc = nn.Dropout(0.5)
         self.bnf = nn.BatchNorm1d(self.conv_dim) 
 
         self.deconv_fc = nn.Linear(self.f_dim+self.z_dim,4*4*256) #4*4 is size 256 is channels
         self.deconv_bnf = nn.BatchNorm1d(4*4*256)
-        self.drop_fc_deconv = nn.Dropout(0.3)
+        self.drop_fc_deconv = nn.Dropout(0.5)
         self.deconv4 = nn.ConvTranspose2d(256,256,kernel_size=4,stride=2,padding=1)
         self.dbn4 = nn.BatchNorm2d(256)
-        self.drop4_deconv = nn.Dropout2d(0.3) 
+        self.drop4_deconv = nn.Dropout2d(0.5) 
         self.deconv3 = nn.ConvTranspose2d(256,256,kernel_size=4,stride=2,padding=1)
         self.dbn3 = nn.BatchNorm2d(256)
-        self.drop3_deconv = nn.Dropout2d(0.3)
+        self.drop3_deconv = nn.Dropout2d(0.5)
         self.deconv2 = nn.ConvTranspose2d(256,256,kernel_size=4,stride=2,padding=1)
         self.dbn2 = nn.BatchNorm2d(256)
-        self.drop2_deconv = nn.Dropout2d(0.3)
+        self.drop2_deconv = nn.Dropout2d(0.5)
         self.deconv1 = nn.ConvTranspose2d(256,3,kernel_size=4,stride=2,padding=1)
 
         for m in self.modules():
@@ -256,7 +256,7 @@ class Trainer(object):
        print("Training is complete")
 
 if __name__ == '__main__':
-    vae = FullQDisentangledVAE(frames=8,f_dim=32,z_dim=32,hidden_dim=512,conv_dim=1024) 
+    vae = FullQDisentangledVAE(frames=8,f_dim=16,z_dim=32,hidden_dim=512,conv_dim=1024) 
     sprites_train = Sprites('./indexed-sprites/lpc-dataset/train/', 6687)
     sprites_test = Sprites('./indexed-sprites/lpc-dataset/test/',873)
     trainloader = torch.utils.data.DataLoader(sprites_train,batch_size=64,shuffle=True,num_workers=4) 

@@ -195,7 +195,7 @@ class Trainer(object):
         with torch.no_grad():
            recon_x = self.model.decode_frames(self.test_zf) 
            recon_x = recon_x.view(16,3,64,64)
-           torchvision.utils.save_image(recon_x,'./Full/%s/epoch%d.png' % (self.sample_path,epoch))
+           torchvision.utils.save_image(recon_x,'./Factorised/%s/epoch%d.png' % (self.sample_path,epoch))
     
     def recon_frame(self,epoch,original):
         with torch.no_grad():
@@ -203,7 +203,7 @@ class Trainer(object):
             image = torch.cat((original,recon),dim=0)
             print(image.shape)
             image = image.view(16,3,64,64)
-            torchvision.utils.save_image(image,'./Full/%s/epoch%d.png' % (self.recon_path,epoch))
+            torchvision.utils.save_image(image,'./Factorised/%s/epoch%d.png' % (self.recon_path,epoch))
 
     def style_transfer(self,epoch):
         with torch.no_grad():
@@ -221,9 +221,9 @@ class Trainer(object):
             image2swap_zf = torch.cat((image1_z,image2_f_expand),dim=2)
             image2_body_image1_motion = self.model.decode_frames(image2swap_zf)
             image2_body_image1_motion = torch.squeeze(image2_body_image1_motion,0)
-            os.makedirs(os.path.dirname('./Full/transfer/epoch%d/image1_body_image2_motion.png' % epoch),exist_ok=True)
-            torchvision.utils.save_image(image1_body_image2_motion,'./Full/transfer/epoch%d/image1_body_image2_motion.png' % epoch)
-            torchvision.utils.save_image(image2_body_image1_motion,'./Full/transfer/epoch%d/image2_body_image1_motion.png' % epoch)
+            os.makedirs(os.path.dirname('./Factorised/transfer/epoch%d/image1_body_image2_motion.png' % epoch),exist_ok=True)
+            torchvision.utils.save_image(image1_body_image2_motion,'./Factorised/transfer/epoch%d/image1_body_image2_motion.png' % epoch)
+            torchvision.utils.save_image(image2_body_image1_motion,'./Factorised/transfer/epoch%d/image2_body_image1_motion.png' % epoch)
 
 
 
