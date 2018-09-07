@@ -60,16 +60,16 @@ class FullQDisentangledVAE(nn.Module):
         self.deconv_fc = nn.Linear(self.f_dim+self.z_dim,4*4*256) #4*4 is size 256 is channels
         self.deconv_bnf = nn.BatchNorm1d(4*4*256)
         self.drop_fc_deconv = nn.Dropout(0.3)
-        self.deconv4 = nn.ConvTranspose2d(256,256,kernel_size=4,stride=2,padding=1,output_padding=1)
+        self.deconv4 = nn.ConvTranspose2d(256,256,kernel_size=4,stride=2,padding=1)
         self.dbn4 = nn.BatchNorm2d(256)
         self.drop4_deconv = nn.Dropout2d(0.3) 
-        self.deconv3 = nn.ConvTranspose2d(256,256,kernel_size=4,stride=2,padding=1,output_padding=1)
+        self.deconv3 = nn.ConvTranspose2d(256,256,kernel_size=4,stride=2,padding=1)
         self.dbn3 = nn.BatchNorm2d(256)
         self.drop3_deconv = nn.Dropout2d(0.3)
-        self.deconv2 = nn.ConvTranspose2d(256,256,kernel_size=4,stride=2,padding=1,output_padding=1)
+        self.deconv2 = nn.ConvTranspose2d(256,256,kernel_size=4,stride=2,padding=1)
         self.dbn2 = nn.BatchNorm2d(256)
         self.drop2_deconv = nn.Dropout2d(0.3)
-        self.deconv1 = nn.ConvTranspose2d(256,3,kernel_size=4,stride=2,padding=1,output_padding=1)
+        self.deconv1 = nn.ConvTranspose2d(256,3,kernel_size=4,stride=2,padding=1)
 
         for m in self.modules():
             if isinstance(m,nn.BatchNorm2d) or isinstance(m,nn.BatchNorm1d):
@@ -117,7 +117,6 @@ class FullQDisentangledVAE(nn.Module):
         return mean,logvar,self.reparameterize(mean,logvar)
     
     def encode_z(self,x):
-        f_expand = f.unsqueeze(1).expand(-1,self.frames,self.f_dim)
         lstm_out,_ = self.z_lstm(x)
         rnn_out,_ = self.z_rnn(lstm_out)
         mean = self.z_mean(self.z_mean_drop(rnn_out))
@@ -196,13 +195,15 @@ class Trainer(object):
         with torch.no_grad():
            recon_x = self.model.decode_frames(self.test_zf) 
            recon_x = recon_x.view(16,3,64,64)
-           torchvision.utils.save_image(recon_x,'./Factorised/%s/epoch%d.png' % (self.sample_path,epoch))
+           torchvision.utils.save_image(recon_x,'./Full/%s/epoch%d.png' % (self.sample_path,epoch))
     
     def recon_frame(self,epoch,original):
         with torch.no_grad():
             _,_,_,_,_,_,recon = self.model(original) 
             image = torch.cat((original,recon),dim=0)
-            torchvision.utils.save_image(image,'./Factorised/%s/epoch%d.png' % (self.recon_path,epoch))
+            print(image.shape)
+            image = image.view(16,3,64,64)
+            torchvision.utils.save_image(image,'./Full/%s/epoch%d.png' % (self.recon_path,epoch))
 
     def style_transfer(self,epoch):
         with torch.no_grad():
@@ -210,19 +211,19 @@ class Trainer(object):
             conv2 = self.model.encode_frames(self.image2)
             _,_,image1_f = self.model.encode_f(conv1)
             image1_f_expand = image1_f.unsqueeze(1).expand(-1,self.model.frames,self.model.f_dim)
-            _,_,image1_z = self.model.encode_z(conv1,image1_f)
+            _,_,image1_z = self.model.encode_z(conv1)
             _,_,image2_f = self.model.encode_f(conv2)
             image2_f_expand = image2_f.unsqueeze(1).expand(-1,self.model.frames,self.model.f_dim)
-            _,_,image2_z = self.model.encode_z(conv2,image2_f)
+            _,_,image2_z = self.model.encode_z(conv2)
             image1swap_zf = torch.cat((image2_z,image1_f_expand),dim=2)
             image1_body_image2_motion = self.model.decode_frames(image1swap_zf)
             image1_body_image2_motion = torch.squeeze(image1_body_image2_motion,0)
             image2swap_zf = torch.cat((image1_z,image2_f_expand),dim=2)
             image2_body_image1_motion = self.model.decode_frames(image2swap_zf)
-            image2_body_image1_motion = self.model.squeeze(image2_body_image1_motion,0)
-
-            torchvision.utils.save_image(image1_body_image2_motion,'./Factorised/transfer/epoch%d/image1_body_image2_motion' % epoch)
-            torchvision.utils.save_image(image2_body_image1_motion,'./Factorised/transfer/epoch%d/image2_body_image1_motion' % epoch)
+            image2_body_image1_motion = torch.squeeze(image2_body_image1_motion,0)
+            os.makedirs(os.path.dirname('./Full/transfer/epoch%d/image1_body_image2_motion.png' % epoch),exist_ok=True)
+            torchvision.utils.save_image(image1_body_image2_motion,'./Full/transfer/epoch%d/image1_body_image2_motion.png' % epoch)
+            torchvision.utils.save_image(image2_body_image1_motion,'./Full/transfer/epoch%d/image2_body_image1_motion.png' % epoch)
 
 
 
@@ -259,8 +260,8 @@ if __name__ == '__main__':
     sprites_test = Sprites('./indexed-sprites/lpc-dataset/test/',873)
     trainloader = torch.utils.data.DataLoader(sprites_train,batch_size=64,shuffle=True,num_workers=4) 
     testloader = torch.utils.data.DataLoader(sprites_test,batch_size=1,shuffle=True,num_workers=4)
-    device = torch.device('cuda:0')
-    trainer = Trainer(vae,device,sprites_train,sprites_test,trainloader,testloader,epochs=300,batch_size=64,learning_rate=0.0001,checkpoints='disentangled-vae.model',nsamples = 2,sample_path='samples',
+    device = torch.device('cuda:1')
+    trainer = Trainer(vae,device,sprites_train,sprites_test,trainloader,testloader,epochs=100,batch_size=64,learning_rate=0.0002,checkpoints='factor-disentangled-vae.model',nsamples = 2,sample_path='samples',
             recon_path='recon') 
     trainer.load_checkpoint()
     trainer.train_model()
