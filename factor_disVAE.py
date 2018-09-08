@@ -255,7 +255,7 @@ class Trainer(object):
        print("Training is complete")
 
 if __name__ == '__main__':
-    vae = FullQDisentangledVAE(frames=8,f_dim=16,z_dim=32,hidden_dim=512,conv_dim=1024) 
+    vae = FullQDisentangledVAE(frames=8,f_dim=32,z_dim=32,hidden_dim=512,conv_dim=1024) 
     sprites_train = Sprites('./indexed-sprites/lpc-dataset/train/', 6687)
     sprites_test = Sprites('./indexed-sprites/lpc-dataset/test/',873)
     trainloader = torch.utils.data.DataLoader(sprites_train,batch_size=64,shuffle=True,num_workers=4) 
