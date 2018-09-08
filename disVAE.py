@@ -46,29 +46,29 @@ class FullQDisentangledVAE(nn.Module):
         self.conv1 = nn.Conv2d(3,32,kernel_size=4,stride=2,padding=1)
         self.conv2 = nn.Conv2d(32,64,kernel_size=4,stride=2,padding=1)
         self.bn2 = nn.BatchNorm2d(64)
-        self.drop2 = nn.Dropout2d(0.5)
+        self.drop2 = nn.Dropout2d(0.4)
         self.conv3 = nn.Conv2d(64,128,kernel_size=4,stride=2,padding=1)
         self.bn3 = nn.BatchNorm2d(128)
-        self.drop3 = nn.Dropout2d(0.5)
+        self.drop3 = nn.Dropout2d(0.4)
         self.conv4 = nn.Conv2d(128,256,kernel_size=4,stride=2,padding=1)
         self.bn4 = nn.BatchNorm2d(256)
-        self.drop4 = nn.Dropout2d(0.5)
+        self.drop4 = nn.Dropout2d(0.4)
         self.conv_fc = nn.Linear(4*4*256,self.conv_dim) #4*4 is size 256 is channels
-        self.drop_fc = nn.Dropout(0.5)
+        self.drop_fc = nn.Dropout(0.4)
         self.bnf = nn.BatchNorm1d(self.conv_dim) 
 
         self.deconv_fc = nn.Linear(self.f_dim+self.z_dim,4*4*256) #4*4 is size 256 is channels
         self.deconv_bnf = nn.BatchNorm1d(4*4*256)
-        self.drop_fc_deconv = nn.Dropout(0.5)
+        self.drop_fc_deconv = nn.Dropout(0.4)
         self.deconv4 = nn.ConvTranspose2d(256,128,kernel_size=4,stride=2,padding=1)
         self.dbn4 = nn.BatchNorm2d(128)
-        self.drop4_deconv = nn.Dropout2d(0.5) 
+        self.drop4_deconv = nn.Dropout2d(0.4) 
         self.deconv3 = nn.ConvTranspose2d(128,64,kernel_size=4,stride=2,padding=1)
         self.dbn3 = nn.BatchNorm2d(64)
-        self.drop3_deconv = nn.Dropout2d(0.5)
+        self.drop3_deconv = nn.Dropout2d(0.4)
         self.deconv2 = nn.ConvTranspose2d(64,32,kernel_size=4,stride=2,padding=1)
         self.dbn2 = nn.BatchNorm2d(32)
-        self.drop2_deconv = nn.Dropout2d(0.5)
+        self.drop2_deconv = nn.Dropout2d(0.4)
         self.deconv1 = nn.ConvTranspose2d(32,3,kernel_size=4,stride=2,padding=1)
 
         for m in self.modules():
@@ -256,13 +256,13 @@ class Trainer(object):
        print("Training is complete")
 
 if __name__ == '__main__':
-    vae = FullQDisentangledVAE(frames=8,f_dim=32,z_dim=32,hidden_dim=512,conv_dim=1024) 
+    vae = FullQDisentangledVAE(frames=8,f_dim=64,z_dim=32,hidden_dim=512,conv_dim=1024) 
     sprites_train = Sprites('./indexed-sprites/lpc-dataset/train/', 6687)
     sprites_test = Sprites('./indexed-sprites/lpc-dataset/test/',873)
     trainloader = torch.utils.data.DataLoader(sprites_train,batch_size=64,shuffle=True,num_workers=4) 
     testloader = torch.utils.data.DataLoader(sprites_test,batch_size=1,shuffle=True,num_workers=4)
     device = torch.device('cuda:0')
-    trainer = Trainer(vae,device,sprites_train,sprites_test,trainloader,testloader,epochs=100,batch_size=64,learning_rate=0.0002,checkpoints='disentangled-vae.model',nsamples = 2,sample_path='samples',
+    trainer = Trainer(vae,device,sprites_train,sprites_test,trainloader,testloader,epochs=200,batch_size=64,learning_rate=0.0002,checkpoints='disentangled-vae.model',nsamples = 2,sample_path='samples',
             recon_path='recon') 
     trainer.load_checkpoint()
     trainer.train_model()

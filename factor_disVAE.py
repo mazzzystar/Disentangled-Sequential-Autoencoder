@@ -255,13 +255,13 @@ class Trainer(object):
        print("Training is complete")
 
 if __name__ == '__main__':
-    vae = FullQDisentangledVAE(frames=8,f_dim=32,z_dim=32,hidden_dim=512,conv_dim=1024) 
+    vae = FullQDisentangledVAE(frames=8,f_dim=64,z_dim=32,hidden_dim=512,conv_dim=1024) 
     sprites_train = Sprites('./indexed-sprites/lpc-dataset/train/', 6687)
     sprites_test = Sprites('./indexed-sprites/lpc-dataset/test/',873)
     trainloader = torch.utils.data.DataLoader(sprites_train,batch_size=64,shuffle=True,num_workers=4) 
     testloader = torch.utils.data.DataLoader(sprites_test,batch_size=1,shuffle=True,num_workers=4)
     device = torch.device('cuda:1')
-    trainer = Trainer(vae,device,sprites_train,sprites_test,trainloader,testloader,epochs=100,batch_size=64,learning_rate=0.0002,checkpoints='factor-disentangled-vae.model',nsamples = 2,sample_path='samples',
+    trainer = Trainer(vae,device,sprites_train,sprites_test,trainloader,testloader,epochs=200,batch_size=64,learning_rate=0.0002,checkpoints='factor-disentangled-vae.model',nsamples = 2,sample_path='samples',
             recon_path='recon') 
     trainer.load_checkpoint()
     trainer.train_model()
