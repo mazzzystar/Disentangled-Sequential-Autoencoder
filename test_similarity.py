@@ -20,11 +20,16 @@ for imageset in ('set1', 'set2', 'set3', 'set4', 'set5', 'set6', 'set7', 'set8',
         conv1 = vae.encode_frames(image1)
         conv2 = vae.encode_frames(image2)
 
-        _,_,image1_f = vae.encode_f(conv1).view(64)
-        _,_,image1_z = vae.encode_z(conv1,image1_f).view(256)
+        _,_,image1_f = vae.encode_f(conv1)
+        _,_,image1_z = vae.encode_z(conv1,image1_f)
 
-        _,_,image2_f = vae.encode_f(conv2).view(64)
-        _,_,image2_z = vae.encode_z(conv2,image2_f).view(256)
+        image1_f = image1_f.view(64)
+        image1_z = image1_z.view(256)
+
+        _,_,image2_f = vae.encode_f(conv2)
+        _,_,image2_z = vae.encode_z(conv2,image2_f)
+        image2_f = image2_f.view(64)
+        image2_z = image2_z.view(256)
 
         similarity_f = image1_f.dot(image2_f) / (image1_f.norm(2) * image2_f.norm(2))
         similarity_z = image1_z.dot(image2_z) / (image1_z.norm(2) * image2_z.norm(2))

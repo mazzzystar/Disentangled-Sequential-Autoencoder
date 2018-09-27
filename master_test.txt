@@ -1,0 +1,24 @@
+set1
+set1 : Cosine similarity of f : 1.0000001192092896 Cosine similarity of z : 0.9999997615814209
+set2
+set2 : Cosine similarity of f : 0.8325755596160889 Cosine similarity of z : 0.09205373376607895
+set3
+set3 : Cosine similarity of f : 0.7777156233787537 Cosine similarity of z : 0.06289313733577728
+set4
+set4 : Cosine similarity of f : 0.19303224980831146 Cosine similarity of z : 0.9531428813934326
+set5
+set5 : Cosine similarity of f : 0.25703591108322144 Cosine similarity of z : 0.966595470905304
+set6
+set6 : Cosine similarity of f : 0.18162383139133453 Cosine similarity of z : 0.969433069229126
+set7
+set7 : Cosine similarity of f : 0.2516670525074005 Cosine similarity of z : 0.9881420135498047
+set8
+set8 : Cosine similarity of f : 0.3116777837276459 Cosine similarity of z : 0.9760106205940247
+set9
+set9 : Cosine similarity of f : -0.0035562312696129084 Cosine similarity of z : 0.975348949432373
+set10
+set10 : Cosine similarity of f : 0.757530689239502 Cosine similarity of z : 0.08323229849338531
+set11
+set11 : Cosine similarity of f : 0.825936496257782 Cosine similarity of z : 0.030653951689600945
+set12
+set12 : Cosine similarity of f : 0.7250195145606995 Cosine similarity of z : 0.08322291821241379
