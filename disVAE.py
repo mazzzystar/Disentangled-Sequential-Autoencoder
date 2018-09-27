@@ -262,7 +262,7 @@ if __name__ == '__main__':
     trainloader = torch.utils.data.DataLoader(sprites_train,batch_size=64,shuffle=True,num_workers=4) 
     testloader = torch.utils.data.DataLoader(sprites_test,batch_size=1,shuffle=True,num_workers=4)
     device = torch.device('cuda:0')
-    trainer = Trainer(vae,device,sprites_train,sprites_test,trainloader,testloader,epochs=50,batch_size=64,learning_rate=0.0002,checkpoints='disentangled-vae.model',nsamples = 2,sample_path='samples',
+    trainer = Trainer(vae,device,sprites_train,sprites_test,trainloader,testloader,epochs=100,batch_size=64,learning_rate=0.0002,checkpoints='disentangled-vae.model',nsamples = 2,sample_path='samples',
             recon_path='recon') 
     trainer.load_checkpoint()
     trainer.train_model()
