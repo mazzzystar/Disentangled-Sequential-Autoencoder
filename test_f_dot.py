@@ -8,9 +8,9 @@ checkpoint = torch.load('disentangled-vae.model')
 vae.load_state_dict(checkpoint['state_dict'])
 vae.eval()
 
-for imageset in ('set1', 'set2', 'set3'):
+for imageset in ('set1', 'set2', 'set3', 'set4', 'set5', 'set6'):
     print(imageset)
-    path = './test/style-transfer/'+imageset+'/'
+    path = './test/similarity-f/'+imageset+'/'
     image1 = torch.load(path + 'image1.sprite')
     image2 = torch.load(path + 'image2.sprite')
     image1 = image1.to(device)
@@ -22,12 +22,13 @@ for imageset in ('set1', 'set2', 'set3'):
         conv2 = vae.encode_frames(image2)
 
         _,_,image1_f = vae.encode_f(conv1)
-        image1_f_expand = image1_f.unsqueeze(1).expand(-1, vae.frames, vae.f_dim)
+        print(image1_f.shape)
+        image1_f = image1_f.view(64)
 
         _,_,image2_f = vae.encode_f(conv2)
-        image2_f_expand = image2_f.unsqueeze(1).expand(-1,vae.frames,vae.f_dim)
-        print(image1_f.shape)
-
+        image2_f = image2_f.view(64)
+        similarity = image1_f.dot(image2_f) / (image1_f.norm(2) * image2_f.norm(2))
+        print(similarity)
     
 
 

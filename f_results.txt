@@ -1,0 +1,18 @@
+set1
+torch.Size([1, 64])
+tensor(0.7777, device='cuda:0')
+set2
+torch.Size([1, 64])
+tensor(0.8326, device='cuda:0')
+set3
+torch.Size([1, 64])
+tensor(1.0000, device='cuda:0')
+set4
+torch.Size([1, 64])
+tensor(0.1930, device='cuda:0')
+set5
+torch.Size([1, 64])
+tensor(0.2570, device='cuda:0')
+set6
+torch.Size([1, 64])
+tensor(0.1816, device='cuda:0')
