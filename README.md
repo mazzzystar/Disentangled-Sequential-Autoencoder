@@ -15,46 +15,46 @@ We perform style transfer by learning the f and z  encodings of two characters t
 <td>Sprite 2's Body With Sprite 1's Pose</td>
 </tr>
 <tr>
-<td height="200%"><img src='test/style-transfer/set1/image1.png'></td>
-<td height="200%"><img src='test/style-transfer/set1/image2.png'></td>
-<td height="200%"><img src='test/style-transfer/set1/image1_body_image2_motion.png'></td>
-<td height="200%"><img src='test/style-transfer/set1/image2_body_image1_motion.png'></td>
+<td height="200%"><img height="200%" src='test/style-transfer/set1/image1.png'></td>
+<td height="200%"><img height="200%" src='test/style-transfer/set1/image2.png'></td>
+<td height="200%"><img height="200%" src='test/style-transfer/set1/image1_body_image2_motion.png'></td>
+<td height="200%"><img height="200%" src='test/style-transfer/set1/image2_body_image1_motion.png'></td>
 </tr>
 <tr>
-<td height="200%"><img src='test/style-transfer/set2/image1.png'></td>
-<td height="200%"><img src='test/style-transfer/set2/image2.png'></td>
-<td height="200%"><img src='test/style-transfer/set2/image1_body_image2_motion.png'></td>
-<td height="200%"><img src='test/style-transfer/set2/image2_body_image1_motion.png'></td>
+<td height="200%"><img height="200%" src='test/style-transfer/set2/image1.png'></td>
+<td height="200%"><img height="200%" src='test/style-transfer/set2/image2.png'></td>
+<td height="200%"><img height="200%" src='test/style-transfer/set2/image1_body_image2_motion.png'></td>
+<td height="200%"><img height="200%" src='test/style-transfer/set2/image2_body_image1_motion.png'></td>
 </tr>
 <tr>
-<td height="200%"><img src='test/style-transfer/set3/image1.png'></td>
-<td height="200%"><img src='test/style-transfer/set3/image2.png'></td>
-<td height="200%"><img src='test/style-transfer/set3/image1_body_image2_motion.png'></td>
-<td height="200%"><img src='test/style-transfer/set3/image2_body_image1_motion.png'></td>
+<td height="200%"><img height="200%" src='test/style-transfer/set3/image1.png'></td>
+<td height="200%"><img height="200%" src='test/style-transfer/set3/image2.png'></td>
+<td height="200%"><img height="200%" src='test/style-transfer/set3/image1_body_image2_motion.png'></td>
+<td height="200%"><img height="200%" src='test/style-transfer/set3/image2_body_image1_motion.png'></td>
 </tr>
 <tr>
-<td height="200%"><img src='test/style-transfer/set4/image1.png'></td>
-<td height="200%"><img src='test/style-transfer/set4/image2.png'></td>
-<td height="200%"><img src='test/style-transfer/set4/image1_body_image2_motion.png'></td>
-<td height="200%"><img src='test/style-transfer/set4/image2_body_image1_motion.png'></td>
+<td height="200%"><img height="200%" src='test/style-transfer/set4/image1.png'></td>
+<td height="200%"><img height="200%" src='test/style-transfer/set4/image2.png'></td>
+<td height="200%"><img height="200%" src='test/style-transfer/set4/image1_body_image2_motion.png'></td>
+<td height="200%"><img height="200%" src='test/style-transfer/set4/image2_body_image1_motion.png'></td>
 </tr>
 <tr>
-<td height="200%"><img src='test/style-transfer/set5/image1.png'></td>
-<td height="200%"><img src='test/style-transfer/set5/image2.png'></td>
-<td height="200%"><img src='test/style-transfer/set5/image1_body_image2_motion.png'></td>
-<td height="200%"><img src='test/style-transfer/set5/image2_body_image1_motion.png'></td>
+<td height="200%"><img height="200%" src='test/style-transfer/set5/image1.png'></td>
+<td height="200%"><img height="200%" src='test/style-transfer/set5/image2.png'></td>
+<td height="200%"><img height="200%" src='test/style-transfer/set5/image1_body_image2_motion.png'></td>
+<td height="200%"><img height="200%" src='test/style-transfer/set5/image2_body_image1_motion.png'></td>
 </tr>
 <tr>
-<td height="200%"><img src='test/style-transfer/set6/image1.png'></td>
-<td height="200%"><img src='test/style-transfer/set6/image2.png'></td>
-<td height="200%"><img src='test/style-transfer/set6/image1_body_image2_motion.png'></td>
-<td height="200%"><img src='test/style-transfer/set6/image2_body_image1_motion.png'></td>
+<td height="200%"><img height="200%" src='test/style-transfer/set6/image1.png'></td>
+<td height="200%"><img height="200%" src='test/style-transfer/set6/image2.png'></td>
+<td height="200%"><img height="200%" src='test/style-transfer/set6/image1_body_image2_motion.png'></td>
+<td height="200%"><img height="200%" src='test/style-transfer/set6/image2_body_image1_motion.png'></td>
 </tr>
 <tr>
-<td height="200%"><img src='test/style-transfer/set7/image1.png'></td>
-<td height="200%"><img src='test/style-transfer/set7/image2.png'></td>
-<td height="200%"><img src='test/style-transfer/set7/image1_body_image2_motion.png'></td>
-<td height="200%"><img src='test/style-transfer/set7/image2_body_image1_motion.png'></td>
+<td height="200%"><img height="200%" src='test/style-transfer/set7/image1.png'></td>
+<td height="200%"><img height="200%" src='test/style-transfer/set7/image2.png'></td>
+<td height="200%"><img height="200%" src='test/style-transfer/set7/image1_body_image2_motion.png'></td>
+<td height="200%"><img height="200%" src='test/style-transfer/set7/image2_body_image1_motion.png'></td>
 </tr>
 </table>
 
