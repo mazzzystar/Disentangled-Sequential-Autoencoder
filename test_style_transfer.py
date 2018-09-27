@@ -12,7 +12,7 @@ for imageset in ('set1', 'set2', 'set3'):
     print(imageset)
     path = './test/style-transfer/'+imageset+'/'
     image1 = torch.load(path + 'image1.sprite')
-    image2 = torch.load()
+    image2 = torch.load(path + 'image2.sprite')
     image1 = image1.to(device)
     image2 = image2.to(device)
     image1 = torch.unsqueeze(image1,0)
