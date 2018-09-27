@@ -37,7 +37,7 @@ for imageset in ('set1', 'set2', 'set3'):
         image2_body_image1_motion = vae.decode_frames(image2swap_zf)
         image2_body_image1_motion = torch.squeeze(image2_body_image1_motion,0)
 
-        torchvision.utils.save_image(image1_body_image2_motion,'image1_body_image2_motion.png')
-        torchvision.utils.save_image(image2_body_image1_motion,'image2_body_image1_motion.png')
+        torchvision.utils.save_image(image1_body_image2_motion,path + 'image1_body_image2_motion.png')
+        torchvision.utils.save_image(image2_body_image1_motion,path + 'image2_body_image1_motion.png')
 
 
