@@ -8,7 +8,7 @@ checkpoint = torch.load('disentangled-vae.model')
 vae.load_state_dict(checkpoint['state_dict'])
 vae.eval()
 
-for imageset in ('set1', 'set2', 'set3'):
+for imageset in ('set1', 'set2', 'set3', 'set4', 'set5', 'set6', 'set7'):
     print(imageset)
     path = './test/style-transfer/'+imageset+'/'
     image1 = torch.load(path + 'image1.sprite')
